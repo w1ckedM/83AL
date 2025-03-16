@@ -1,0 +1,64 @@
+#+title: Root Configuration
+#+startup: show2levels
+#+property: header-args :mkdirp yes
+
+* pacman
+** config - [[file:/etc/pacman.conf][pacman.conf]]
+#+begin_src conf :tangle "/doas::/etc/pacman.conf"
+  [options]
+  HoldPkg     = pacman glibc
+  XferCommand = /usr/bin/curl -L -C - -f -o %o %u
+  Architecture = auto
+  NoUpgrade = etc/fstab
+  Color
+  CheckSpace
+  VerbosePkgLists
+  ParallelDownloads = 5
+  DownloadUser = alpm
+  SigLevel    = Required DatabaseOptional
+  LocalFileSigLevel = Optional
+
+  [core-x86-64-v3]
+  Include = /etc/pacman.d/alhp-mirrorlist
+
+  [core]
+  Include = /etc/pacman.d/mirrorlist
+
+  [extra-x86-64-v3]
+  Include = /etc/pacman.d/alhp-mirrorlist
+
+  [extra]
+  Include = /etc/pacman.d/mirrorlist
+
+  [archlinuxcn]
+  SigLevel = Optional TrustAll
+  Include = /etc/pacman.d/mirrorlist-archlinuxcn
+#+end_src
+* repository
+** ustc mirror - [[file:/etc/pacman.d/mirrorlist][mirrorlist]]
+#+begin_src conf :tangle "/doas::/etc/pacman.d/mirrorlist"
+Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
+#+end_src
+** archlinuxcn - [[file:/etc/pacman.d/mirrorlist-archlinuxcn][mirrorlist-archlinuxcn]]
+#+begin_src conf :tangle "/doas::/etc/pacman.d/mirrorlist-archlinuxcn"
+Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+#+end_src
+** alhp - [[file:/etc/pacman.d/alhp-mirrorlist][alhp-mirrorlist]]
+#+begin_src conf :tangle "/doas::/etc/pacman.d/alhp-mirrorlist"
+  Server = https://mirrors.shanghaitech.edu.cn/alhp/$repo/os/$arch/
+  Server = https://mirror.nju.edu.cn/alhp/$repo/os/$arch/
+  Server = https://mirror.sjtu.edu.cn/alhp/$repo/os/$arch/
+#+end_src
+* hook
+** pkglist
+#+begin_src conf :tangle "/doas::/etc/pacman.d/hooks/pkglist.hook"
+  [Trigger]
+  Operation = Install
+  Operation = Remove
+  Type = Package
+  Target = *
+
+  [Action]
+  When = PostTransaction
+  Exec = /bin/sh -c '/usr/bin/pacman -Qqe > /home/wimi/dotfile/pkglist.txt'
+#+end_src

@@ -1,0 +1,488 @@
+#+title: Emacs Configuration
+#+startup: show2levels
+#+property: header-args :mkdirp yes
+
+* early-init - [[file:~/.config/emacs/early-init.el][early-init.el]]
+** head
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  ;;; -*- lexical-binding: t; no-byte-compile: t; -*-
+#+end_src
+** 优化
+*** 垃圾回收优化
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setq gc-cons-threshold most-positive-fixnum
+        gc-cons-percentage 0.5)
+  (add-hook 'window-setup-hook
+            (lambda ()
+              (setq gc-cons-threshold (expt 2 24)
+                    gc-cons-percentage 0.1)))
+#+end_src
+*** 包管理
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setq package-enable-at-startup nil
+        package-quickstart nil)
+#+end_src
+*** 显示和消息
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setq message-log-max nil
+        auto-window-vscroll nil
+        fast-but-imprecise-scrolling t
+        ad-redefinition-action 'accept
+        initial-major-mode 'fundamental-mode)
+#+end_src
+*** 原生编译
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setq native-comp-async-report-warnings-errors 'silent
+        native-comp-speed 2
+        native-comp-async-jobs-number (min 4 (max 1 (/ (num-processors) 2)))
+        native-comp-deferred-compilation t)
+#+end_src
+*** 进程输出
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setq read-process-output-max (* 4 1024 1024))
+#+end_src
+** 禁用
+*** UI
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tooltip-mode -1)
+#+end_src
+*** 启动屏幕/消息/铃声/模式行
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setq inhibit-startup-screen t
+        inhibit-startup-message t
+        inhibit-startup-echo-area-message t
+        ring-bell-function 'ignore
+        mode-line-format nil)
+#+end_src
+*** 备份和锁文件
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setq backup-inhibited t
+        auto-save-default nil
+        make-backup-files nil
+        create-lockfiles nil)
+#+end_src
+*** 图形界面
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (when (display-graphic-p)
+    (setq inhibit-compacting-font-caches t)
+    (push '(inhibit-double-buffering . t) default-frame-alist)
+    (push '(undecorated . t) default-frame-alist))
+#+end_src
+*** 默认帧
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setq default-frame-alist
+        '((menu-bar-lines . 0)
+          (tool-bar-lines . 0)
+          (vertical-scroll-bars . nil)
+          (horizontal-scroll-bars . nil)
+          (fullscreen . maximized))
+        frame-inhibit-implied-resize t
+        frame-resize-pixelwise t)
+#+end_src
+** 语言环境设置
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (setenv "LANG" "en_US.UTF-8")
+  (set-language-environment "UTF-8")
+  (prefer-coding-system 'utf-8)
+#+end_src
+** foot
+#+begin_src elisp :tangle ~/.config/emacs/early-init.el
+  (provide 'early-init)
+  ;;; early-init.el ends here
+#+end_src
+* init - [[file:~/.config/emacs/init.el][init.el]]
+** head
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  ;;; -*- lexical-binding: t; no-byte-compile: t; -*-
+#+end_src
+** load
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+#+end_src
+** 包管理
+*** 使用中国科学技术大学的镜像源
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (setq package-archives '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
+                           ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
+                           ("nongnu" . "https://mirrors.ustc.edu.cn/elpa/nongnu/")))
+#+end_src
+*** 初始化包管理系统，加载仓库
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (package-initialize)
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+  (setq use-package-always-ensure t
+        use-package-verbose t)
+#+end_src
+** 配置文件
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package custom
+    :init
+    (setq custom-file (concat user-emacs-directory "custom.el"))
+    (when (file-exists-p custom-file)
+      (load custom-file)))
+#+end_src
+** 默认选项
+*** emacs
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package emacs
+    :init
+    (defun my/set-frame-fonts ()
+      (set-face-attribute 'default nil :font "Comic Mono-18")
+      (set-fontset-font t 'latin "Comic Mono")
+      (set-fontset-font t 'han "LXGW WenKai"))
+    (my/set-frame-fonts)
+    (setq default-frame-alist
+          '((vertical-scroll-bars . nil)
+            (horizontal-scroll-bars . nil)))
+    (add-hook 'after-make-frame-functions
+              (lambda (frame)
+                (select-frame frame)
+                (my/set-frame-fonts)))
+    (defalias 'yes-or-no-p 'y-or-n-p)
+    :custom
+    (display-line-numbers-widen t)
+    (display-line-numbers-type 'relative)
+    (auto-revert-interval 5)
+    (enable-recursive-minibuffers t)
+    (indent-tabs-mode nil)
+    (sentence-end-double-space nil)
+    (show-trailing-whitespace t)
+    :config
+    (global-auto-revert-mode 1)
+    (global-visual-line-mode t)
+    (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+    (add-hook 'text-mode-hook #'display-line-numbers-mode)
+    (add-hook 'gptel-mode-hook (lambda () (display-line-numbers-mode -1))))
+#+end_src
+*** elec-pair
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package elec-pair
+    :init
+    (electric-pair-mode t)
+    (electric-indent-mode t)
+    :custom
+    (electric-pair-preserve-balance t))
+#+end_src
+*** dired
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package dired
+    :config
+    (put 'dired-find-alternate-file 'disabled nil))
+#+end_src
+*** org
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package org
+    :config
+    (setq org-hide-emphasis-markers t
+          org-fontify-done-headline t
+          org-hide-leading-starts t
+          org-pretty-entities t
+          org-startup-indented t
+          org-src-tab-acts-natively t))
+#+end_src
+** 界面
+*** catppuccin-theme
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package catppuccin-theme
+    :ensure t
+    :custom
+    (catppuccin-flavor 'frappe)
+    :config
+    (load-theme 'catppuccin t))
+#+end_src
+*** doom-modeline
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package doom-modeline
+    :ensure t
+    :custom
+    (doom-modeline-height 25)                 ;; 设置高度
+    (doom-modeline-bar-width 3)               ;; 调整进度条宽度
+    :hook (after-init . doom-modeline-mode))  ;; 延迟初始化
+#+end_src
+** 补全
+*** vertico
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package vertico
+    :ensure t
+    :custom
+    (vertico-cycle t)
+    (vertico-resize t)
+    (vertico-count 16)
+    :hook
+    (after-init . vertico-mode))
+#+end_src
+*** orderless
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package orderless
+    :ensure t
+    :custom
+    (orderless-component-separator "[ &]")
+    (orderless-matching-styles '(orderless-literal orderless-regexp))
+    (completion-styles '(orderless basic))
+    (completion-category-defaults nil)
+    (completion-category-overrides '((file (styles . (orderless partial-completion))))))
+#+end_src
+*** marginalia
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package marginalia
+    :ensure t
+    :hook (after-init . marginalia-mode))
+#+end_src
+*** corfu
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package corfu
+    :ensure t
+    :init
+    (global-corfu-mode)
+    :custom
+    (corfu-auto t)
+    (corfu-auto-prefix 2)
+    (corfu-cycle t)
+    (corfu-preselect-first nil)
+    (corfu-preview-current nil)
+    (corfu-popupinfo-delay 0.5)
+    (corfu-on-exact-match 'insert)
+    :config
+    (defun corfu-setup ()
+      (setq-local completion-at-point-functions
+		  (list (cape-dabbrev-better-capf)
+			(cape-file-capf)
+			(cape-rfc1345-capf)
+			(cape-sabbrev-capf)
+			(cape-symbol-capf)
+			(cape-dict-capf)))))
+#+end_src
+*** consult
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package consult
+    :ensure t)
+#+end_src
+*** embark
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package embark
+    :demand t
+    :init
+    (setq prefix-help-command #'embark-prefix-help-command)
+    :config
+    (add-to-list 'display-buffer-alist
+                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                   nil
+                   (window-parameters (mode-line-format . none)))))
+
+  (use-package embark-consult
+    :after (embark consult)
+    :demand t
+    :hook
+    (embark-collect-mode . consult-preview-at-point-mode))
+#+end_src
+*** yasnippet
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1))
+#+end_src
+** 编辑
+*** evil
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package evil
+    :ensure t
+    :init
+    (evil-mode 1)
+    :config
+    (evil-define-key 'normal org-mode-map (kbd "C-i") #'org-cycle))
+#+end_src
+** 项目
+*** projectile
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package projectile
+    :ensure t
+    :init
+    (projectile-mode +1)
+    :custom
+    (projectile-completion-system 'default)                ;; 使用默认补全系统
+    (projectile-switch-project-action #'projectile-dired)) ;; 切换项目时默认打开Dired
+#+end_src
+*** magit
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package magit
+    :ensure t)
+#+end_src
+** which key
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package which-key
+    :ensure t
+    :diminish which-key-mode
+    :custom
+    (which-key-idle-delay 1)
+    (which-key-add-column-padding 4)
+    :init
+    (which-key-mode 1)
+    :config
+    (which-key-add-key-based-replacements
+      "C-c a" "Chatbox"
+      "C-c c" "Coding"
+      "C-c g" "Git"
+      "C-c p" "Project"
+      "C-c z" "Mode"))
+#+end_src
+** Term
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package vterm
+    :ensure t
+    :defer t)
+#+end_src
+** PDF
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package pdf-tools
+    :ensure t
+    :defer t
+    :init
+    (pdf-tools-install)
+    :custom
+    (pdf-view-midnight-colors '("#c6d0f5" . "#303446"))
+    :config
+    (defun my/pdf-view-mode-setup ()
+      (blink-cursor-mode -1)                                           ;; 禁用光标闪烁
+      (set (make-local-variable 'evil-normal-state-cursor) (list nil)) ;; 自定义Evil光标
+      (pdf-view-midnight-minor-mode))                                  ;; 启用夜间模式
+    (add-hook 'pdf-view-mode-hook #'my/pdf-view-mode-setup))
+#+end_src
+** 大语言模型
+*** gptel
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package gptel
+    :ensure t
+    :custom
+    (gptel-temperature 0.5)
+    (gptel-expert-commands t)
+    (gptel-default-mode 'org-mode)
+    (gptel-prompt-prefix-alist '((org-mode . "@user\n")))
+    (gptel-response-prefix-alist '((org-mode . "@assistant\n")))
+    :init
+    (gptel-make-openai "Qwen"
+      :host "dashscope.aliyuncs.com"
+      :endpoint "/compatible-mode/v1/chat/completions"
+      :key (auth-source-pick-first-password :host "dashscope.aliyuncs.com")
+      :stream t
+      :models '(qwen-max-latest))
+    (gptel-make-openai "DeepSeek"
+      :host "api.siliconflow.cn"
+      :endpoint "/v1/chat/completions"
+      :key (auth-source-pick-first-password :host "api.siliconflow.cn")
+      :stream t
+      :models '(Pro/deepseek-ai/DeepSeek-R1 Pro/deepseek-ai/DeepSeek-V3))
+    (setq gptel-backend (gptel-get-backend "Qwen"))
+    :config
+    (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
+    (add-hook 'gptel-post-response-functions 'gptel-end-of-response))
+#+end_src
+*** elysium
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (use-package elysium
+    :custom
+    (elysium-window-size 0.33)
+    (elysium-window-style 'vertical))
+
+  (use-package smerge-mode
+    :ensure nil
+    :hook
+    (prog-mode . smerge-mode))
+#+end_src
+** foot
+#+begin_src elisp :tangle ~/.config/emacs/init.el
+  (require 'keybinding)
+  (require 'proxy)
+  (provide 'init)
+  ;;; init.el ends here
+  #+end_src
+* lisp
+** keybinding - [[file:~/.config/emacs/lisp/keybinding.el][keybinding.el]]
+*** head
+#+begin_src elisp :tangle ~/.config/emacs/lisp/keybinding.el
+    ;;; -*- lexical-binding: t; no-byte-compile: t; -*-
+#+end_src
+*** main
+#+begin_src elisp :tangle ~/.config/emacs/lisp/keybinding.el
+  (use-package emacs
+    :bind
+    (("C-c a g" . gptel)
+     ("C-c a a" . gptel-add)
+     ("C-c a f" . gptel-add-file)
+     ("C-c a s" . gptel-send)
+     ("C-c a r" . gptel-rewrite)
+     ("C-c a p" . gptel-org-set-properties)
+     ("C-c a t" . gptel-org-set-topic)
+     ("C-c a m" . gptel-menu)
+     ;;; buffer
+     ("C-c b" . consult-buffer)
+     ("C-c B" . consult-bookmark)
+     ("C-c e" . eval-buffer)
+     ("C-c f" . consult-find)
+     ("C-c l" . consult-line)
+     ("C-c m" . consult-mark)
+     ("C-c r" . revert-buffer)
+     ("C-c y" . consult-yank-from-kill-ring)
+     ;;; coding assistant
+     ("C-c c a" . elysium-add-context)
+     ("C-c c d" . elysium-discard-all-suggested-changes)
+     ("C-c c c" . elysium-clear-buffer)
+     ("C-c c k" . elysium-keep-all-suggested-changes)
+     ("C-c c q" . elysium-query)
+     ("C-c c t" . elysium-toggle-window)
+     ("C-c c m" . smerge-keep-mine)
+     ("C-c c n" . smerge-next)
+     ("C-c c o" . smerge-keep-other)
+     ("C-c c p" . smerge-previous)
+     ;;; mode
+     ("C-c z g" . gptel-mode)
+     ("C-c z o" . org-mode)
+     ("C-c z v" . vterm)
+     ("C-c z R" . restart-emacs))
+    :bind-keymap
+    ("C-c g" . magit-mode-map)
+    ("C-c p" . projectile-command-map))
+#+end_src
+*** foot
+#+begin_src elisp :tangle ~/.config/emacs/lisp/keybinding.el
+  (provide 'keybinding)
+  ;;; keybinding.el ends here
+#+end_src
+** proxy - [[file:~/.config/emacs/lisp/proxy.el][proxy.el]]
+*** head
+#+begin_src elisp :tangle ~/.config/emacs/lisp/proxy.el
+  ;;; -*- lexical-binding: t; no-byte-compile: t; -*-
+#+end_src
+*** main
+#+begin_src elisp :tangle ~/.config/emacs/lisp/proxy.el
+  (defvar my-proxy-server "127.0.0.1")
+  (defvar my-proxy-port "20171")
+
+  (defun enable-proxy ()
+    (interactive)
+    (setq url-proxy-services
+          `(("http" . ,(concat my-proxy-server ":" my-proxy-port))
+            ("https" . ,(concat my-proxy-server ":" my-proxy-port))))
+    (message "HTTP Proxy enabled: %s:%s" my-proxy-server my-proxy-port))
+
+  (defun disable-proxy ()
+    (interactive)
+    (setq url-proxy-services nil)
+    (message "HTTP Proxy disabled."))
+
+  (defun toggle-proxy ()
+    (interactive)
+    (if url-proxy-services
+        (disable-proxy)
+      (enable-proxy)))
+#+end_src
+*** foot
+#+begin_src elisp :tangle ~/.config/emacs/lisp/proxy.el
+  (provide 'proxy)
+  ;;; proxy.el ends here
+#+end_src

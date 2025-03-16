@@ -1,0 +1,1311 @@
+#+title: Hyprland Configuration
+#+startup: show2levels
+#+property: header-args :mkdirp yes
+
+* hyprland
+** config
+*** main - [[file:~/.config/hypr/hyprland.conf][hyprland.conf]]
+#+begin_src conf :tangle ~/.config/hypr/hyprland.conf
+source = ~/.config/hypr/conf/00-environment.conf
+source = ~/.config/hypr/conf/01-preload.conf
+source = ~/.config/hypr/conf/01-autoload.conf
+source = ~/.config/hypr/conf/02-output.conf
+source = ~/.config/hypr/conf/02-input.conf
+source = ~/.config/hypr/conf/03-layout.conf
+source = ~/.config/hypr/conf/03-animation.conf
+source = ~/.config/hypr/conf/04-rule.conf
+source = ~/.config/hypr/conf/05-binding.conf
+source = ~/.config/hypr/conf/06-submap.conf
+#+end_src
+*** environment - [[file:~/.config/hypr/conf/00-environment.conf][00-environment]]
+**** hyprland
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+env = HYPRLAND_TRACE,0
+env = HYPRLAND_NO_RT,0
+env = HYPRLAND_NO_SD_NOTIFY,1
+env = HYPRLAND_NO_SD_VARS,1
+#env = HYPRLAND_CONFIG
+#+end_src
+**** aquamarine
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+env = AQ_TRACE,0
+env = AQ_DRM_DEVICES,/dev/dri/card1
+env = AQ_NO_MODIFIERS,1
+#+end_src
+**** xdg
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+env = XDG_CURRENT_DESKTOP,Hyprland
+env = XDG_SESSION_TYPE,wayland
+env = XDG_SESSION_DESKTOP,Hyprland
+#+end_src
+**** cjk
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+env = LANG,zh_CN.UTF-8
+env = LC_CTYPE,C.UTF-8
+env = GTK_IM_MODULE,wayland
+env = QT_IM_MODULE,wayland;fcitx;ibus
+env = SDL_IM_MODULE,fcitx
+env = GLFW_IM_MODULE,fcitx
+env = INPUT_METHOD,fcitx
+env = IMSETTINGS_MODULE,fcitx
+#+end_src
+**** toolkit backend
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+env = GDK_BACKEND,wayland
+env = QT_QPA_PLATFORM,wayland
+env = SDL_VIDEODRIVER,wayland
+env = CLUTTER_BACKEND,wayland
+#+end_src
+**** ssh
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+env = SSH_AUTH_SOCK,$XDG_RUNTIME_DIR/ssh-agent.socket
+#+end_src
+**** gtk
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+#env = GTK_THEME,Catppuccin-Dark-Frappe
+#env = GTK_FONT,LXGW WenKai 16
+#env = GTK_SCALE,2
+#env = GDK_SCALE,2
+#+end_src
+**** qt
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+env = QT_AUTO_SCREEN_SCALE_FACTOR,1
+env = QT_WAYLAND_DISABLE_WINDOWDECORATION,1
+env = QT_QPA_PLATFORMTHEME,qt6ct
+#+end_src
+**** cursor
+#+begin_src conf :tangle ~/.config/hypr/conf/00-environment.conf
+env = HYPRCURSOR_THEME,catppuccin-frappe-light-cursors
+env = HYPRCURSOR_SIZE,36
+env = XCURSOR_THEME,catppuccin-frappe-light-cursors
+env = XCURSOR_SIZE,36
+#+end_src
+*** preloading - [[file:~/.config/hypr/conf/01-preload.conf][01-preload.conf]]
+#+begin_src conf :tangle ~/.config/hypr/conf/01-preload.conf
+# XDPH
+exec-once = xdg-desktop-portal
+# polkit agent
+exec-once = systemctl --user start hyprpolkitagent
+# dbus
+exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec-once = systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+# init wallpaper engine
+exec-once = hyprpaper
+# init IM engine
+exec-once = fcitx5 -d
+# init panel
+exec-once = waybar
+# init notification daemon
+exec-once = mako
+# init clipboard daemon
+exec-once = wl-paste --watch cliphist store
+# init automount daemon
+exec-once = udiskie -s
+# init emacs server
+exec-once = emacs --daemon
+# login - hyprlock
+exec-once = hyprlock
+#+end_src
+*** autoload - [[file:~/.config/hypr/conf/01-autoload.conf][01-autoload.conf]]
+#+begin_src conf :tangle ~/.config/hypr/conf/01-autoload.conf
+#exec-once = [workspace 1 silent] emacsclient -a "" -c
+exec-once = [workspace 2 silent] braveb
+#exec-once = [workspace 9 silent] kitty yazi
+#+end_src
+*** output device - [[file:~/.config/hypr/conf/02-output.conf][02-output.conf]]
+**** laptop - [[file:~/.config/hypr/conf/22-output-laptop.conf][22-output-laptop.conf]]
+#+begin_src conf :tangle ~/.config/hypr/conf/22-output-laptop.conf
+monitor = eDP-1, preferred, 0x0, 1
+monitor = DP-3, disable
+#+end_src
+**** single monitor - [[file:~/.config/hypr/conf/22-output-single.conf][22-output-single.conf]]
+#+begin_src conf :tangle ~/.config/hypr/conf/22-output-single.conf
+monitor = DP-3, preferred, 0x0, 1
+monitor = eDP-1, disable
+#+end_src
+**** muti monitor - [[file:~/.config/hypr/conf/22-output-muti.conf][22-output-muti.config]]
+#+begin_src conf :tangle ~/.config/hypr/conf/22-output-muti.conf
+# ?: left
+# XiaoMi 27Pro: center
+# XiaoXinPro14: right
+monitor= DP-3, preferred, 0x0, 1
+monitor= eDP-1, preferred, 2560x0,1.5
+#monitor= eDP-1, preferred,1.5, transform, 1
+#+end_src
+*** input device - [[file:~/.config/hypr/conf/02-input.conf][02-input.conf]]
+#+begin_src conf :tangle ~/.config/hypr/conf/02-input.conf
+input {
+  follow_mouse = 2
+  # -1.0 - 1.0, 0 means no modification.
+  sensitivity = 0
+  touchpad {
+    disable_while_typing = false
+    natural_scroll = no
+    tap-to-click = true
+    drag_lock = true
+    tap-and-drag = true
+  }
+}
+gestures {
+  workspace_swipe = true
+  workspace_swipe_fingers = 3
+  workspace_swipe_create_new = false
+}
+cursor{
+  inactive_timeout = 3
+}
+#+end_src
+*** layout - [[file:~/.config/hypr/conf/03-layout.conf][03-layout.conf]]
+#+begin_src conf :tangle ~/.config/hypr/conf/03-layout.conf
+general {
+  gaps_in = 8
+  gaps_out = 8
+  border_size = 0
+  col.active_border = rgba(c6d0f5ff)
+  col.inactive_border = rgba(303446ff)
+  layout = master
+  resize_on_border = true
+}
+misc {
+  disable_hyprland_logo = yes
+  disable_splash_rendering = true
+  disable_hyprland_qtutils_check = true
+}
+ecosystem {
+  no_update_news = true
+}
+dwindle {
+  pseudotile = true
+  force_split = 2
+  special_scale_factor = 0.80
+  default_split_ratio = 1.20
+}
+master {
+  special_scale_factor = 0.80
+  mfact = 0.60
+  new_status = slave
+}
+decoration {
+  rounding = 0
+  active_opacity = 0.80
+  inactive_opacity = 0.60
+  fullscreen_opacity = 1.00
+  shadow {
+    enabled = true
+    range = 16
+    render_power = 4
+    ignore_window = true
+    color = rgba(c6d0f5ff)
+    color_inactive = rgba(303446ff)
+  }
+  blur {
+    enabled = true
+    size = 4
+    passes = 2
+    special = true
+    popups = true
+    contrast = 0.618 # 0.0 - 2.0 : 0.8916
+    brightness = 0.618 # 0.0 - 2.0 : 0.8172
+  }
+}
+#+end_src
+*** animation - [[file:~/.config/hypr/conf/03-animation.conf][03-animation.conf]]
+#+begin_src conf :tangle ~/.config/hypr/conf/03-animation.conf
+animations {
+  enabled = false
+}
+animations {
+  enabled = true
+  bezier = default, 1, 1, 1, 1
+  animation = windowsIn, 1, 3, default, popin
+  animation = windowsOut, 1, 3, default, popin
+  animation = windowsMove, 1, 3, default, slide
+  animation = workspaces, 1, 3, default, slide
+  animation = specialWorkspace, 1, 3, default, slidefadevert
+}
+#animations {
+#  enabled = true
+#  bezier = easeOutBack, 0.34, 1.56, 0.64, 1
+#  bezier = easeInBack, 0.36, 0, 0.66, -0.56
+#  animation = windowsIn, 1, 3, easeOutBack, popin
+#  animation = windowsOut, 1, 3, easeOutBack, popin
+#  animation = windowsMove, 1, 3, easeOutBack, slide
+#  animation = workspaces, 1, 3, easeInBack, slide
+#  animation = specialWorkspace, 1, 3, easeOutBack, slidefadevert
+#}
+#+end_src
+*** window/workspace rule - [[file:~/.config/hypr/conf/04-rule.conf][04-rule.conf]]
+**** general
+#+begin_src conf :tangle ~/.config/hypr/conf/04-rule.conf
+# sub menu
+windowrulev2 = noblur,class:(),title:(), floating:1
+windowrulev2 = noshadow,class:(),title:(), floating:1
+windowrulev2 = opaque,class:(),title:(), floating:1
+# web browser popup
+windowrulev2 = float, initialClass:^(Brave)$
+windowrulev2 = center, initialClass:^(Brave)$
+# readability
+windowrulev2 = opaque, class:^(brave-browser)$
+windowrulev2 = opaque, class:^(mpv)$
+#+end_src
+**** monitor
+#+begin_src conf :tangle ~/.config/hypr/conf/04-rule.conf
+workspace= 1, monitor:DP-3
+workspace= 2, monitor:DP-3, default:true
+workspace= 3, monitor:DP-3
+workspace= 4, monitor:DP-3
+workspace= 5, monitor:DP-3
+workspace= 6, monitor:DP-3
+workspace= 7, monitor:DP-3
+workspace= 8, monitor:DP-3
+workspace= 9, monitor:eDP-1, layoutopt:orientation:top
+#+end_src
+**** special workspace
+#+begin_src conf :tangle ~/.config/hypr/conf/04-rule.conf
+workspace = special:term, on-created-empty:kitty --title bash
+workspace = special:bluetooth, on-created-empty:[float; size 50% 50%]kitty bluetui
+workspace = special:keybinding, on-created-empty:[float; size 50% 50%]kitty keyb
+workspace = special:netease, on-created-empty:[float; size 50% 50%]kitty musicfox
+workspace = special:pulsemixer, on-created-empty:[float; size 50% 50%]kitty pulsemixer
+workspace = special:mpc, on-created-empty:[float; size 50% 50%]kitty rmpc
+workspace = special:top, on-created-empty:kitty btop
+workspace = special:wifi, on-created-empty:[float; size 50% 75%]kitty impala
+workspace = special:en-zh, on-created-empty:[float; size 50% 50%]kitty clitrans
+#+end_src
+*** key binding - [[file:~/.config/hypr/conf/05-binding.conf][05-binding.conf]]
+**** buitin
+#+begin_src conf :tangle ~/.config/hypr/conf/05-binding.conf
+# SUPER: WIN
+$mainMod = SUPER
+# monitor
+bind = $mainMod, a, focusmonitor, eDP-1
+bind = $mainMod, d, focusmonitor, DP-3
+# workspace
+bind = $mainMod, 1, workspace, 1
+bind = $mainMod, 2, workspace, 2
+bind = $mainMod, 3, workspace, 3
+bind = $mainMod, 4, workspace, 4
+bind = $mainMod, 5, workspace, 5
+bind = $mainMod, 6, workspace, 6
+bind = $mainMod, 7, workspace, 7
+bind = $mainMod, 8, workspace, 8
+bind = $mainMod, 9, workspace, 9
+bind = $mainMod, b, focusurgentorlast,
+bind = $mainMod, p, workspace, e-1
+bind = $mainMod, n, workspace, e+1
+# window
+bind = $mainMod, h, movefocus, l
+bind = $mainMod, l, movefocus, r
+bind = $mainMod, k, movefocus, u
+bind = $mainMod, j, movefocus, d
+bind = $mainMod, f, fullscreenstate, 1
+bind = $mainMod, q, killactive,
+bind = $mainMod, t, exec, hyprctl setprop active opaque toggle
+#+end_src
+**** special
+#+begin_src conf :tangle ~/.config/hypr/conf/05-binding.conf
+binde = $mainMod, return, togglespecialworkspace, term
+binde = $mainMod shift, b, togglespecialworkspace, bluetooth
+binde = $mainMod shift, k, togglespecialworkspace, keybinding
+binde = $mainMod shift, n, togglespecialworkspace, netease
+binde = $mainMod shift, p, togglespecialworkspace, pulsemixer
+binde = $mainMod shift, r, togglespecialworkspace, mpc
+binde = $mainMod shift, t, togglespecialworkspace, top
+binde = $mainMod shift, w, togglespecialworkspace, wifi
+binde = $mainMod shift, z, togglespecialworkspace, en-zh
+#+end_src
+**** application
+#+begin_src conf :tangle ~/.config/hypr/conf/05-binding.conf
+  # launcher
+  bind = $mainMod, o, exec, tofi-drun | xargs hyprctl dispatch exec
+  bind = $mainMod, r, exec, tofi-run | xargs hyprctl dispatch exec
+  # terminal
+  bind = $mainMod, u, exec, kitty zsh
+  # editor
+  bind = $mainMod, e, exec, emacsclient -a "" -c
+  # web browser
+  bind = $mainMod, i, exec, braveb
+  # file browser
+  bind = $mainMod, y, exec, kitty yazi
+  # c&p
+  bind = $mainMod, x, exec, cliphist list | tofi --prompt-text='Cliphist 「剪切」: '| cliphist decode | wl-copy
+  # command help
+  bind = $mainMod, c, exec, helper
+  # select
+  bind = $mainMod, g, exec, window-select
+  # visual active
+  bind = $mainMod, v, exec, hyprsunset -t 6000
+  # waybar toggle
+  bind = $mainMod, w, exec, killall -SIGUSR1 waybar
+  bind = $mainMod, z, exec, hyprctl keyword monitor eDP-1,disable
+  # vscode
+  bind = $mainMod, Space, exec, code
+#+end_src
+*** submap - [[file:~/.config/hypr/conf/06-submap.conf][06-submap.conf]]
+**** workspace
+#+begin_src conf :tangle ~/.config/hypr/conf/06-submap.conf
+# move active workspace to monitor/swap
+#bind = $mainMod, ?, submap, 移动当前工作区至[ x ]小新[ m ]主屏[ s ]互换
+#submap = 移动当前工作区至[ x ]小新[ m ]主屏[ s ]互换
+#binde = , x, movecurrentworkspacetomonitor, eDP-1
+#binde = , m, movecurrentworkspacetomonitor, HDMI-A-1
+#binde = , s, swapactiveworkspaces, eDP-1 HDMI-A-1
+#bind = , escape, submap, reset
+#submap = reset
+#+end_src
+**** window
+#+begin_src conf :tangle ~/.config/hypr/conf/06-submap.conf
+# move active window to monitor/direction
+#bind = $mainMod, ?, submap, 移动当前窗口至[ x ]笔电[ m ]主屏[ k ]上[ j ]下[ h ]左[ l ]右
+#submap = 移动当前窗口至[ x ]笔电[ m ]主屏[ k ]上[ j ]下[ h ]左[ l ]右
+#binde = , h, movewindow, l
+#binde = , l, movewindow, r
+#binde = , k, movewindow, u
+#binde = , j, movewindow, d
+#binde = , x, movewindow, mon:eDP-1
+#binde = , m, movewindow, mon:HDMI-A-1
+#bind = , escape, submap, reset
+#submap = reset
+# move active window to workspace
+#bind = $mainMod, ?, submap, 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 ]工作区
+#submap = 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 ]工作区
+#binde = , 1, movetoworkspacesilent, 1
+#binde = , 2, movetoworkspacesilent, 2
+#binde = , 3, movetoworkspacesilent, 3
+#binde = , 4, movetoworkspacesilent, 4
+#binde = , 5, movetoworkspacesilent, 5
+#binde = , 6, movetoworkspacesilent, 6
+#binde = , 7, movetoworkspacesilent, 7
+#binde = , 8, movetoworkspacesilent, 8
+#binde = , 9, movetoworkspacesilent, 9
+#bind = , escape, submap, reset
+#submap = reset
+# move active window to workspace and focus
+bind = $mainMod, m, submap, 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 ]工作区并聚焦
+submap = 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 ]工作区并聚焦
+bind = , 1, movetoworkspace, 1
+bind = , 1, submap, reset
+bind = , 2, movetoworkspace, 2
+bind = , 2, submap, reset
+bind = , 3, movetoworkspace, 3
+bind = , 3, submap, reset
+bind = , 4, movetoworkspace, 4
+bind = , 4, submap, reset
+bind = , 5, movetoworkspace, 5
+bind = , 5, submap, reset
+bind = , 6, movetoworkspace, 6
+bind = , 6, submap, reset
+bind = , 7, movetoworkspace, 7
+bind = , 7, submap, reset
+bind = , 8, movetoworkspace, 8
+bind = , 8, submap, reset
+bind = , 9, movetoworkspace, 9
+bind = , 9, submap, reset
+bind = , escape, submap, reset
+submap = reset
+# position new window
+#bind = $mainMod, ?, submap, 定位新窗口[ k ]上[ j ]下[ j ]左[ l ]右
+#submap = 定位新窗口[ k ]上[ j ]下[ j ]左[ l ]右
+#binde = , h, layoutmsg, preselect l
+#binde = , l, layoutmsg, preselect r
+#binde = , k, layoutmsg, preselect u
+#binde = , j, layoutmsg, preselect d
+#bind = , escape, submap, reset
+#submap = reset
+# resize active window
+#bind = $mainMod, ?, submap, [ k ]纵轴上移[ j ]纵轴下移, [ j ]横轴左移[ l ]横轴右移
+#submap = [ k ]纵轴上移[ j ]纵轴下移, [ j ]横轴左移[ l ]横轴右移
+#binde = , h, resizeactive, -128 0
+#binde = , j, resizeactive, 0 128
+#binde = , k, resizeactive, 0 -128
+#binde = , l, resizeactive, 128 0
+#bind = , escape, submap, reset
+#submap = reset
+#+end_src
+**** function
+#+begin_src conf :tangle ~/.config/hypr/conf/06-submap.conf
+# general setup
+bind = $mainMod shift, c, submap, 界面：[ m ]主从[ d ]螺旋[ r ]刷新[ s ]切换
+submap = 界面：[ m ]主从[ d ]螺旋[ r ]刷新[ s ]切换
+bind = , m, exec, hyprctl keyword general:layout master
+bind = , m, submap, reset
+bind = , d, exec, hyprctl keyword general:layout dwindle
+bind = , d, submap, reset
+bind = , r, exec, killall -SIGUSR2 waybar
+bind = , r, submap, reset
+bind = , s, exec, waybar-select
+bind = , s, submap, reset
+bind = , escape, submap, reset
+submap = reset
+# screenshot
+bind = $mainMod, s, submap, 截图：[ s ]全屏[ w ]窗口[ a ]区域
+submap = 截图：[ s ]全屏[ w ]窗口[ a ]区域
+bind = , s, submap, 截图：[ m ]主屏[ x ]小新
+submap = 截图：[ m ]主屏[ x ]小新
+bind = , escape, submap, reset
+bind = , m, exec, hyprshot -m output -m DP-3 -o ~/picture/screenshot
+bind = , x, exec, hyprshot -m output -m eDP-1 -o ~/picture/screenshot
+bind = , b, submap, 截图：[ s ]全屏[ w ]窗口[ a ]区域
+submap = 截图：[ s ]全屏[ w ]窗口[ a ]区域
+bind = , w, exec, hyprshot -m window -m active -o ~/picture/screenshot
+bind = , a, exec, hyprshot -m region -o ~/picture/screenshot
+bind = , escape, submap, reset
+submap = reset
+# laptop monitor setup
+bind = $mainMod shift, m, submap, 小新：[ u ]唤醒[ d ]息屏[ r ]右横[ v ]右竖[ l ]左横
+submap = 小新：[ u ]唤醒[ d ]息屏[ r ]右横[ v ]右竖[ l ]左横
+bind = , u, exec, hyprctl dispatch dpms on eDP-1
+bind = , u, submap,reset
+bind = , d, exec, hyprctl dispatch dpms off eDP-1
+bind = , d, submap,reset
+bind = , r, exec, hyprctl keyword monitor eDP-1,2880x1800@60,2560x0,1
+bind = , v, exec, hyprctl keyword monitor eDP-1,2880x1800@60,2560x0,1,transform,1
+bind = , l, exec, hyprctl keyword monitor eDP-1,2880x1800@60,-2560x0,1
+bind = , escape, submap, reset
+submap = reset
+# power setup
+bind = $mainMod shift, q, submap,[ l ]锁屏[ p ]关机[ r ]重启[ e ]退出
+submap = [ l ]锁屏[ p ]关机[ r ]重启[ e ]退出
+bind = , l, exec, hyprlock
+bind = , l, submap, reset
+bind = , p, exec, doas shutdown now
+bind = , r, exec, doas reboot
+bind = , e, exit,
+bind = , escape, submap, reset
+submap = reset
+#+end_src
+* wallpaper
+** config - [[file:~/.config/hypr/hyprpaper.conf][hyprpaper.conf]]
+#+begin_src conf :tangle ~/.config/hypr/hyprpaper.conf
+preload = ~/wallpaper/blackcat-girl-4.jpg
+preload = ~/wallpaper/blackcat-girl-4.jpg
+wallpaper = DP-3, ~/wallpaper/blackcat-girl-4.jpg
+wallpaper = eDP-1, ~/wallpaper/blackcat-girl-4.jpg
+#+end_src
+* launcher
+** config - [[file:~/.config/tofi/config][config]]
+#+begin_src conf :tangle ~/.config/tofi/config
+# font
+font = "LXGW WenKai"
+font-size = 16
+font-variations = "wght 1200"
+hint-font = false
+
+# text
+background-color = #303446
+text-color = #c6d0f5
+selection-background = #c6d0f5
+selection-color = #303446
+prompt-color = #8caaee
+
+# text cursor
+text-cursor-style = underscore
+
+# text layout
+prompt-text = "擇: "
+horizontal = true
+result-spacing = 16
+
+# window theming
+width = 1184
+height = 48
+outline-width = 0
+border-width = 2
+border-color = #c6d0f5
+scale = true
+
+# window positioning
+anchor = center
+
+# behaviour
+hide-cursor = true
+text-cursor = true
+history = true
+fuzzy-match = false
+drun-launch = false
+terminal = kitty
+#+end_src
+* locker
+** config - [[file:~/.config/hypr/conf/hyprlock.conf][hyprlock.conf]]
+#+begin_src conf :tangle ~/.config/hypr/hyprlock.conf
+background {
+    monitor =
+    path = ~/wallpaper/blackcat-girl-2.jpg
+    blur_passes = 1
+}
+input-field {
+    monitor =
+    size = 512, 48
+    outer_color = rgba(198,208,245,1)
+    inner_color = rgba(48,52,70,1)
+    font_family = LXGW WenKai
+    font_color = rgba(198,208,245,1)
+    rounding = 30
+    position = 0, -512
+    halign = center
+    valign = center
+}
+label {
+    monitor =
+    text =
+    text_align = center
+    color = rgba(48,52,70,1)
+    font_size = 24
+    font_family = Sarasa Term SC Nerd
+    position = 0, 512
+    halign = center
+    valign = center
+}
+#+end_src
+* notification
+** config - [[file:~/.config/mako/config][config]]
+#+begin_src conf :tangle ~/.config/mako/config
+# general
+font=LXGW WenKai 14
+max-history=32
+sort=-time
+default-timeout=2500
+ignore-timeout=1
+format=%a\n%s\n%b
+
+# style
+anchor=center
+layer=top
+margin=0,0
+outer-margin=8,0
+width=720
+height=512
+padding=8,8
+border-size=1
+text-alignment=center
+
+# icon
+icons=1
+max-icon-size=32
+icon-location=left
+
+# color
+background-color=#303446
+border-color=#c6d0f5
+text-color=#c6d0f5
+#+end_src
+* panel
+** config
+*** laptop - [[file:~/.config/waybar/conf/laptop.json][laptop.json]]
+#+begin_src conf :tangle ~/.config/waybar/conf/laptop.json
+[
+  {
+    "output": "eDP-1",
+    "name": "ltop",
+    "layer": "top",
+    "position": "top",
+    "margin-top": 8,
+    "margin-left": 8,
+    "margin-right": 8,
+    "reload_style_on_change": true,
+    "include": [
+      "~/.config/waybar/modules/network.json",
+      "~/.config/waybar/modules/battery.json",
+      "~/.config/waybar/modules/hyprwin.json",
+      "~/.config/waybar/modules/wireplumber.json",
+      "~/.config/waybar/modules/cnclock.json"
+    ],
+    "modules-left": [
+      "network",
+      "battery"
+    ],
+    "modules-center": [
+      "hyprland/window"
+    ],
+    "modules-right": [
+      "wireplumber",
+      "custom/cnclock"
+    ],
+  },
+  {
+    "output": "eDP-1",
+    "name": "lbottom",
+    "layer": "top",
+    "position": "bottom",
+    "margin-left": 8,
+    "margin-right": 8,
+    "reload_style_on_change": true,
+    "include": [
+      "~/.config/waybar/modules/hyprwss.json",
+      "~/.config/waybar/modules/mpris.json",
+      "~/.config/waybar/modules/hyprsub.json",
+      "~/.config/waybar/modules/tray.json"
+    ],
+    "modules-left": [
+      "mpris"
+    ],
+    "modules-center": [
+      "hyprland/workspaces"
+    ],
+    "modules-right": [
+      "hyprland/submap",
+      "tray"
+    ]
+  }
+]
+#+end_src
+*** single monitor - [[file:~/.config/waybar/conf/single.json][single.json]]
+#+begin_src conf :tangle ~/.config/waybar/conf/single.json
+[
+  {
+    "output": "DP-3",
+    "name": "h1top",
+    "layer": "top",
+    "position": "top",
+    "margin-top": 8,
+    "margin-left": 8,
+    "margin-right": 8,
+    "reload_style_on_change": true,
+    "include": [
+      "~/.config/waybar/modules/network.json",
+      "~/.config/waybar/modules/battery.json",
+      "~/.config/waybar/modules/hyprwin.json",
+      "~/.config/waybar/modules/wireplumber.json",
+      "~/.config/waybar/modules/cnclock.json"
+    ],
+    "modules-left": [
+      "network",
+      "battery"
+    ],
+    "modules-center": [
+      "hyprland/window"
+    ],
+    "modules-right": [
+      "wireplumber",
+      "custom/cnclock"
+    ]
+  },
+  {
+    "output": "DP-3",
+    "name": "h1bottom",
+    "layer": "top",
+    "position": "bottom",
+    "margin-left": 8,
+    "margin-right": 8,
+    "reload_style_on_change": true,
+    "include": [
+      "~/.config/waybar/modules/hyprwss.json",
+      "~/.config/waybar/modules/mpris.json",
+      "~/.config/waybar/modules/hyprsub.json",
+      "~/.config/waybar/modules/tray.json"
+    ],
+    "modules-left": [
+      "mpris"
+    ],
+    "modules-center": [
+      "hyprland/workspaces"
+    ],
+    "modules-right": [
+      "hyprland/submap",
+      "tray"
+    ]
+  }
+]
+#+end_src
+*** muti monitor - [[file:~/.config/waybar/conf/muti.json][muti.json]]
+#+begin_src conf :tangle ~/.config/waybar/conf/muti.json
+[
+  {
+    "output": "DP-3",
+    "name": "h1top",
+    "layer": "top",
+    "position": "top",
+    "margin-top": 8,
+    "margin-left": 8,
+    "margin-right": 8,
+    "reload_style_on_change": true,
+    "include": [
+      "~/.config/waybar/modules/network.json",
+      "~/.config/waybar/modules/battery.json",
+      "~/.config/waybar/modules/hyprwin.json",
+      "~/.config/waybar/modules/wireplumber.json",
+      "~/.config/waybar/modules/cnclock.json"
+    ],
+    "modules-left": [
+      "network",
+      "battery"
+    ],
+    "modules-center": [
+      "hyprland/window"
+    ],
+    "modules-right": [
+      "wireplumber",
+      "custom/cnclock"
+    ]
+  },
+  {
+    "output": "DP-3",
+    "name": "h1bottom",
+    "layer": "top",
+    "position": "bottom",
+    "margin-left": 8,
+    "margin-right": 8,
+    "reload_style_on_change": true,
+    "include": [
+      "~/.config/waybar/modules/hyprwss.json",
+      "~/.config/waybar/modules/mpris.json",
+      "~/.config/waybar/modules/hyprsub.json",
+      "~/.config/waybar/modules/tray.json"
+    ],
+    "modules-left": [
+      "mpris"
+    ],
+    "modules-center": [
+      "hyprland/workspaces"
+    ],
+    "modules-right": [
+      "hyprland/submap",
+      "tray"
+    ]
+  }
+]
+#+end_src
+** module
+*** battery - [[file:~/.config/waybar/modules/battery.json][modules/battery.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/battery.json
+{
+    "battery": {
+      "interval": 60,
+      "format": "電.【{capacity}%】 久.【{time}】",
+      "format-time": "{H}時{M}分",
+      "format-Charging": "C.{capacity}% {timeTo}",
+      "states": {
+        "warning": 19,
+        "critical": 9
+      },
+      "tooltip": false
+    }
+}
+#+end_src
+*** clock - [[file:~/.config/waybar/modules/clock.json][modules/clock.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/clock.json
+{
+    "clock": {
+      "interval": 60,
+      "format": "歷.【{:%y年%m月%d日】 時.【%H時%M分}】",
+      "timezone": "Asia/Shanghai",
+      "locale": "zh_CN.UTF-8",
+      "tooltip": false
+    }
+}
+#+end_src
+*** cnclock - [[file:~/.config/waybar/modules/cnclock.json][cnclock.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/cnclock.json
+{
+  "custom/cnclock": {
+    "exec": "~/.local/bin/cnclock",
+    "interval": 60,  // 刷新间隔（秒）
+    "format": "{}",  // 直接显示脚本输出
+    "tooltip": false
+  }
+}
+#+end_src
+*** cpu - [[file:~/.config/waybar/modules/cpu.json][modules/cpu.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/cpu.json
+{
+    "cpu": {
+      "interval": 60,
+      "format": "核.【{usage}%】",
+      "tooltip": false
+    }
+}
+#+end_src
+*** hyprsub - [[file:~/.config/waybar/modules/hyprsub.json][modules/hyprsub.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/hyprsub.json
+{
+    "hyprland/submap": {
+/*      "format": "<span>\ue632</span>\t {}", */
+      "format": "{}",
+      "tooltip": false
+    }
+}
+#+end_src
+*** hyprwin - [[file:~/.config/waybar/modules/hyprwin.json][modules/hyprwin.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/hyprwin.json
+{
+    "hyprland/window": {
+/*      "format": "<span>\uf268</span>\t【 {class} 】 <span>之</span> 【 {title} 】", */
+      "format": "【 {class} 】 <span>之</span> 【 {title} 】",
+      "icon-size": 16,
+      "separate-outputs": false,
+      "tooltip": false
+    }
+}
+#+end_src
+*** hyprwss - [[file:~/.config/waybar/modules/hyprwss.json][modules/hyprwss.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/hyprwss.json
+{
+    "hyprland/workspaces": {
+      "active-only": false,
+      "format": "{icon}",
+      "sort-by-number": true,
+      "on-scroll-up": "hyprctl dispatch workspace m+1",
+      "on-scroll-down": "hyprctl dispatch workspace m-1",
+      "format-icons": {
+        "1": "臨",
+        "2": "兵",
+        "3": "鬥",
+        "4": "者",
+        "5": "皆",
+        "6": "陣",
+        "7": "列",
+        "8": "前",
+        "9": "行"
+      },
+      "persistent-workspaces": {
+        "1": [
+        ],
+        "2": [
+        ],
+        "3": [
+        ],
+        "4": [
+        ],
+        "5": [
+        ],
+        "6": [
+        ],
+        "7": [
+        ],
+        "8": [
+        ],
+        "9": [
+        ]
+      }
+    }
+}
+#+end_src
+*** memory - [[file:~/.config/waybar/modules/memory.json][modules/memory.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/memory.json
+{
+    "memory": {
+      "interval": 60,
+      "format": "存.【{percentage}%】",
+      "tooltip": false
+    }
+}
+#+end_src
+*** mpris - [[file:~/.config/waybar/modules/mpris.json][modules/mpris.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/mpris.json
+{
+    "mpris": {
+      "format": "音.【{player}】 播.【{artist}】之【{title}】",
+      "artist-len": 32,
+      "title-len": 64,
+      "tooltip": false
+    }
+}
+#+end_src
+*** network - [[file:~/.config/waybar/modules/network.json][modules/network.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/network.json
+{
+    "network": {
+      "interval": 60,
+/*      "format-wifi": "<span>\udb82\udce8</span>\t聯.【{essid}】強.【{signalStrength}】", */
+      "format-wifi": "聯.【{essid}】",
+/*      "format-ethernet": "<span>\udb82\udce8</span>\t聯.【{bandwidthTotalBytes}】", */
+      "format-ethernet": "聯.【{bandwidthTotalBytes}】",
+      "format-disconnected": "無",
+      "tooltip": false
+    }
+}
+#+end_src
+*** tray - [[file:~/.config/waybar/modules/tray.json][modules/tray.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/tray.json
+{
+    "tray": {
+      "icon-size": 16,
+      "spacing": 8,
+      "tooltip": false
+    }
+}
+#+end_src
+*** wireplumber - [[file:~/.config/waybar/modules/wireplumber.json][modules/wireplumber.json]]
+#+begin_src css :tangle ~/.config/waybar/modules/wireplumber.json
+{
+    "wireplumber": {
+      "interval": 60,
+/*      "format": "<span>\ue24f</span>\t源.【{node_name}】 聲.【{volume}%】", */
+      "format": "源.【{node_name}】",
+      "format-muted": "靜",
+      "max-volume": 150.0,
+      "scroll-step": 5,
+      "tooltip": true,
+      "tooltip-format": "{volume}%"
+    }
+}
+#+end_src
+** color scheme - [[file:~/.config/waybar/style.css][style.css]]
+**** general
+#+begin_src css :tangle ~/.config/waybar/style.css
+@keyframes blink {
+    to {
+        color: rgba(48,52,70,1);
+        background-color: rgba(198,208,245,0.8);
+    }
+}
+
+window#waybar {
+    font-family: LXGW WenKai, Symbols Nerd Font;
+    font-weight: 700;
+    color: rgba(198,208,245,1);
+}
+
+window.h1top#waybar {
+    background-color: rgba(48,52,70,0.8);
+    font-size: 18px;
+    box-shadow: 0px 0px 4px 4px rgba(198,208,245,1);
+}
+window.h1bottom#waybar {
+    background-color: transparent;
+    font-size: 16px;
+}
+window.ltop#waybar {
+    background-color: rgba(48,52,70,0.8);
+    font-size: 24px;
+    box-shadow: 0px 0px 4px 4px rgba(198,208,245,1);
+}
+window.lbottom#waybar {
+    background-color: transparent;
+    font-size: 24px;
+}
+#+end_src
+**** top - left
+#+begin_src css :tangle ~/.config/waybar/style.css
+#network {
+    margin: 0em 1em 0em 0.5em;
+}
+
+#cpu {
+    margin: 0em 1em 0em 0em;
+}
+
+#memory {
+    margin: 0em 1em 0em 0em;
+}
+
+#battery {
+    margin: 0em 1em 0em 0em;
+}
+#battery.warning {
+    color: rgba(231,130,132,1);
+    padding: 0em 1em;
+}
+#battery.critical {
+    color: rgba(231,130,132,1);
+    padding: 0em 1em;
+    animation-name: blink;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+#battery.charging {
+    color: rgba(140,170,238,1);
+    padding: 0em 1em;
+    box-shadow: 0px 0px 4px 4px rgba(198,208,245,1);
+}
+#+end_src
+**** top - center
+#+begin_src css :tangle ~/.config/waybar/style.css
+window.DP-3 #window {
+    margin: 0.5em 1em;
+}
+window.eDP-1 #window {
+    margin: 0.5em 1em;
+}
+#+end_src
+**** top - right
+#+begin_src css :tangle ~/.config/waybar/style.css
+#wireplumber {
+    margin: 0em 1em 0em 0em;
+}
+#wireplumber.muted {
+    color: rgba(231,130,132,1);
+}
+
+#clock {
+    margin: 0em 0em 0em 1em;
+}
+#+end_src
+**** bottom - left
+#+begin_src css :tangle ~/.config/waybar/style.css
+#mpris {
+    font-size: 18px;
+    color: rgba(198,208,245,1);
+    background-color: rgba(48,52,70,0.8);
+    margin: 0em 1em 0em 0em;
+    padding: 0em 1em;
+    border-radius: 30px;
+}
+#+end_src
+**** bottom - center
+#+begin_src css :tangle ~/.config/waybar/style.css
+#workspaces {
+}
+#workspaces button {
+    margin: 0.5em 1em 0.3em 1em;
+    border-radius: 50%;
+    color: rgba(48,52,70,1);
+    background-color: rgba(198,208,245,0.8);
+    box-shadow: 0px 0px 4px 4px rgba(48,52,70,1);
+}
+#workspaces button.empty {
+    color: rgba(198,208,245,1);
+    background-color: rgba(48,52,70,0.8);
+    box-shadow: 0px 0px 4px 4px rgba(198,208,245,1);
+}
+#workspaces button.active {
+    color: rgba(198,208,245,1);
+    background-color: rgba(48,52,70,0.8);
+    box-shadow: 0px 0px 4px 4px rgba(48,52,70,1);
+    animation-name: blink;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+#workspaces button.urgent {
+    box-shadow: 0px 0px 4px 4px rgba(231,130,132,1);
+}
+#+end_src
+
+#+RESULTS:
+#+begin_example
+#workspaces {
+}
+#workspaces button {
+    margin: 0.8em 1em 0.3em 1em;
+    border-radius: 50%;
+    color: rgba(48,52,70,1);
+    background-color: rgba(198,208,245,0.8);
+    box-shadow: 0px 0px 8px 8px rgba(48,52,70,1);
+}
+#workspaces button.empty {
+    color: rgba(198,208,245,1);
+    background-color: rgba(48,52,70,0.8);
+    box-shadow: 0px 0px 4px 4px rgba(198,208,245,1);
+}
+#workspaces button.active {
+    color: rgba(198,208,245,1);
+    background-color: rgba(48,52,70,0.8);
+    box-shadow: 0px 0px 8px 8px rgba(48,52,70,1);
+    animation-name: blink;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+#workspaces button.urgent {
+    box-shadow: 0px 0px 8px 8px rgba(231,130,132,1);
+}
+#+end_example
+
+**** bottom - right
+#+begin_src css :tangle ~/.config/waybar/style.css
+window.DP-3 #submap {
+    font-size: 18px;
+    color: rgba(198,208,245,1);
+    background-color: rgba(48,52,70,0.8);
+    margin: 0em 0em 0em 1em;
+    padding: 0em 1em;
+    border-radius: 30px;
+}
+window.eDP-1 #submap {
+    font-size: 24px;
+    color: rgba(198,208,245,1);
+    background-color: rgba(48,52,70,0.8);
+    margin: 0em 0em 0em 1em;
+    padding: 0em 1em;
+    border-radius: 30px;
+}
+
+#tray {
+    margin: 0em 0em 0em 1em;
+    padding: 0em 0.5em;
+}
+#+end_src
+* script
+** xdg desktop portal - [[file:~/.local/bin/xdg-desktop-portal][xdg-desktop-portal]]
+#+begin_src bash :tangle ~/.local/bin/xdg-desktop-portal :shebang #!/usr/bin/env bash
+sleep 1
+killall -e xdg-desktop-portal-hyprland
+killall -e xdg-desktop-portal-wlr
+killall xdg-desktop-portal
+/usr/libexec/xdg-desktop-portal-hyprland &
+sleep 2
+/usr/libexec/xdg-desktop-portal &
+#+end_src
+** helper - [[file:~/.local/bin/helper][helper]]
+#+begin_src bash :tangle ~/.local/bin/helper :shebang #!/usr/bin/env bash
+  _helper=$(fd -e org --base-directory ~/org/cheatsheet | awk -F. '{print $1}' | tofi --prompt-text='Helper 「帮助」: ')
+  awk 'NR>2' ~/org/cheatsheet/"${_helper}".org | tofi --horizontal false --width 720 --height 512 | awk -F'>>>' '{print $1}' | wl-copy
+#+end_src
+** monitor handle - [[file:~/.local/bin/monitor-handle][monitor-handle]]
+#+begin_src bash :tangle ~/.local/bin/monitor-handle :shebang #!/usr/bin/env bash
+handle() {
+    case $1 in monitoradded*)
+                   hyprctl dispatch moveworkspacetomonitor "1 1"
+                   hyprctl dispatch moveworkspacetomonitor "2 1"
+                   hyprctl dispatch moveworkspacetomonitor "3 1"
+                   ln -sf ~/.config/hypr/conf/22-output-triple.conf ~/.config/hypr/conf/02-output.conf
+                    ln -sf ~/.config/waybar/conf/muti.json ~/.config/waybar/config
+                    pkill waybar && waybar
+            ;;
+                monitorremoved*)
+                    ln -sf ~/.config/hypr/conf/22-output-laptop.conf ~/.config/hypr/conf/02-output.conf
+                    ln -sf ~/.config/waybar/conf/laptop.json ~/.config/waybar/config
+                    pkill waybar && waybar
+            ;;
+    esac
+}
+
+socat -U - "UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/.socket2.sock" | while read -r line; do handle "$line"; done
+#+end_src
+** monitor switch - [[file:~/.local/bin/monitor-switch][monitor-switch]]
+#+begin_src bash :tangle ~/.local/bin/monitor-switch :shebang #!/usr/bin/env bash
+_monitor=$(printf "eDP-1\nDP-3" | tofi --prompt-text='Monitor「显示器」: ')
+_action=$(printf "turn_on\nturn_off\npower_on\npower_off" | tofi --prompt-text='Action「操作」: ')
+
+case ${_monitor} in
+    eDP-1)
+        if [ "${_action}" = 'turn_on' ]; then
+            hyprctl dispatch dpms on "${_monitor}"
+        elif [ "${_action}" = 'turn_off' ]; then
+            hyprctl dispatch dpms off "${_monitor}"
+        elif [ "${_action}" = 'power_on' ]; then
+            hyprctl keyword monitor eDP-1,preferred,0x0,1
+        elif [ "${_action}" = 'power_off' ]; then
+            hyprctl keyword monitor "${_monitor}",disable
+        else
+            echo "wtf"
+        fi
+        ;;
+    DP-3)
+        if [ "${_action}" = 'turn_on' ]; then
+            hyprctl dispatch dpms on "${_monitor}"
+        elif [ "${_action}" = 'turn_off' ]; then
+            hyprctl dispatch dpms off "${_monitor}"
+        elif [ "${_action}" = 'power_on' ]; then
+            hyprctl keyword monitor DP-3,preferred,2880x0,1
+        elif [ "${_action}" = 'power_off' ]; then
+            hyprctl keyword monitor "${_monitor}",disable
+        else
+            echo "wtf"
+        fi
+        ;;
+esac
+
+#+end_src
+** cnclock - [[file:~/.local/bin/cnclock][cnclock]]
+#+begin_src bash :tangle ~/.local/bin/cnclock :shebang #!/usr/bin/env bash
+  # 数字转中文映射表
+  cn_digits=("〇" "一" "二" "三" "四" "五" "六" "七" "八" "九")
+  cn_weekdays=("一" "二" "三" "四" "五" "六" "日")  # 周一至周日映射
+
+  # 通用两位数转换逻辑（支持 0-99）
+  convert_two_digits() {
+    local num=$1
+    [[ $num == 0* ]] && num=${num#0} # 去除前导零
+
+    if ((num < 10)); then
+      echo "${cn_digits[num]}"
+    elif ((num == 10)); then
+      echo "十"
+    elif ((num < 20)); then
+      echo "十${cn_digits[num - 10]}"
+    elif ((num < 100)); then
+      local ten=$((num / 10))
+      local one=$((num % 10))
+      if ((one == 0)); then
+	echo "${cn_digits[ten]}十" # 避免 "二十〇"
+      else
+	echo "${cn_digits[ten]}十${cn_digits[one]}"
+      fi
+    fi
+  }
+
+  # 四位数年份逐字转换（如2025→二零二五）
+  convert_year() {
+    local year=$1
+    local cn_year=""
+    for ((i = 0; i < ${#year}; i++)); do
+      cn_year+=${cn_digits[${year:$i:1}]}
+    done
+    echo "$cn_year"
+  }
+
+  # 获取时间组件并转换
+  now=$(date "+%Y|%m|%d|%H|%M|%u")
+  IFS='|' read year month day hour minute weekday_num <<<"$now"
+
+  # 检查时间范围
+  if ((minute >= 60)); then
+    echo "错误：分钟数超出范围"
+    exit 1
+  fi
+
+  cn_year=$(convert_year "$year")
+  cn_month=$(convert_two_digits "${month#0}")
+  cn_day=$(convert_two_digits "${day#0}")
+  cn_hour=$(convert_two_digits "${hour#0}")
+  cn_minute=$(convert_two_digits "${minute#0}")
+  cn_weekday="周${cn_weekdays[$((weekday_num - 1))]}"  # 转换周数
+
+  # 组合输出
+  echo "歷.【${cn_year}年${cn_month}月${cn_day}日 · ${cn_weekday}】 時.【${cn_hour}時${cn_minute}分】"
+#+end_src
+** window select - [[file:~/.local/bin/window-select][window-select]]
+#+begin_src bash :tangle ~/.local/bin/window-select :shebang #!/usr/bin/env bash
+# 生成带唯一分隔符的列表（class + title + address）
+mapfile -t raw_entries < <(
+  hyprctl clients -j |
+    jq -r '.[] | "\(.class) >>> \(.title)\(.address)"'
+)
+
+# 生成仅显示 class 和 title 的列表
+display_list=()
+for entry in "${raw_entries[@]}"; do
+  display_list+=("$(echo "$entry" | sed 's/.*//')")
+done
+
+# 用户通过 tofi 选择条目
+selected=$(printf "%s\n" "${display_list[@]}" |
+  tofi --horizontal false --width 720 --height 512)
+
+# 通过索引匹配原始数据提取 address
+address=""
+for i in "${!display_list[@]}"; do
+  if [[ "${display_list[i]}" == "$selected" ]]; then
+    address=$(echo "${raw_entries[i]}" | sed 's/.*//')
+    break
+  fi
+done
+
+# 聚焦窗口
+if [[ -n "$address" ]]; then
+  hyprctl dispatch focuswindow "address:$address"
+fi
+#+end_src
+** workspace select - [[file:~/.local/bin/workspace-select][workspace-select]]
+#+begin_src bash :shebang #!/usr/bin/env bash :tangle ~/.local/bin/workspace-select
+_format=$(printf "\"\(.monitor) | \(.name) | \(.lastwindowtitle)\"")
+_workspaces="$(hyprctl workspaces -j | jq -r ".[] | ${_format}")"
+_workspace=$(echo "${_workspaces}" | tofi --horizontal false --width 720 --height 512 | cut -d "|" -f 2)
+hyprctl dispatch workspace ${_workspace}
+#+end_src
+** waybar select - [[file:~/.local/bin/waybar-select][waybar-select]]
+#+begin_src bash :shebang #!/usr/bin/env bash :tangle ~/.local/bin/waybar-select
+_monitor_set=$(fd 22-output-* ~/.config/hypr/conf | awk -F'-' '{print $3}' | xargs -I {} basename {} '.conf' | tofi --prompt-text='Waybar profile「面板方案」: ')
+[ -z "${_monitor_set}" ] && exit
+
+ln -sf ~/.config/waybar/conf/"${_monitor_set}".json ~/.config/waybar/config &
+ ln -sf ~/.config/hypr/conf/22-output-"${_monitor_set}".conf ~/.config/hypr/conf/02-output.conf &
+pkill waybar &&
+    waybar
+#+end_src

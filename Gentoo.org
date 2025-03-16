@@ -1,0 +1,95 @@
+#+title: Gentoo Installation Note of Lenovo83AL ( XiaoXin Pro 14 IRH8 )
+#+startup: show2levels
+
+* prepare the disk
+** partition the disk
+#+begin_src sh :shebang #!/usr/bin/env bash
+  sudo su
+  mkfs.vfat -F 32 -n EFI /dev/nvme0n1p1
+  mkfs.btrfs -f -L LXS /dev/nvme0n1p2
+  exit
+#+end_src
+** create btrfs subvolume
++ partition scheme
+#+begin_src sh :shebang #!/usr/bin/env bash
+  mount /dev/nvme0n1p2 /mnt
+  btrfs su cr /mnt/@
+  btrfs su cr /mnt/@home
+  umount /mnt
+  exit
+#+end_src
+** mount partition
+#+begin_src sh :shebang #!/usr/bin/env bash
+  mount -o compress=zstd,noatime,ssd,autodefrag,subvol=@ /dev/nvme0n1p2 /mnt/
+  mkdir -p /mnt/{boot/efi,home,tmp,var}
+  mount -o compress=zstd,noatime,ssd,autodefrag,subvol=@home /dev/nvme0n1p2 /mnt/home
+  mount /dev/nvme0n1p1 /mnt/boot/efi
+  exit
+#+end_src
+** chattr
+#+begin_src bash
+  chattr -R +C /mnt/tmp
+  chattr -R +C /mnt/var
+  exit
+#+end_src
+* Install stage3 tarball
++ [[https://mirrors.ustc.edu.cn/gentoo/releases/amd64/autobuilds/][mirrors.ustc.edu.cn]]
+#+begin_src sh :dir /mnt :shebang #!/usr/bin/env bash
+  cp /home/gentoo/Downloads/*.xz ./
+  tar xpvf /mnt/stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner ./
+  rm *.xz
+  cp --dereference /etc/resolv.conf /mnt/etc/
+  genfstab -t LABEL /mnt | tee /mnt/etc/fstab
+  rm -rf /mnt/etc/portage/{package.mask,package.use,binrepos.conf}
+  exit
+#+end_src
+* install system
+** time, locale, passwd, user
+#+begin_src sh :shebang #!/usr/bin/env bash
+  arch-chroot /mnt
+  source /etc/profile
+  ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+  hwclock --systohc
+  locale-gen
+  useradd -g users -G wheel,portage,audio,video -m wimi
+  passwd
+  passwd wimi
+  exit
+#+end_src
+** sync main repo
+#+begin_src sh :shebang #!/usr/bin/env bash
+  emerge-webrsync
+  getuto
+  emerge --oneshot sys-apps/portage dev-vcs/git sys-kernel/gentoo-kernel-bin
+  rm -rf /var/db/repos/gentoo
+  emaint sync
+  git clone https://gitee.com/w1ckedM/83AL
+  exit
+#+end_src
+** rebuild base system
+#+begin_src sh :shebang #!/usr/bin/env bash
+  emerge -avuDN @world
+  emerge --depclean
+  exit
+#+end_src
+** efi boot
+#+begin_src sh :shebang #!/usr/bin/env bash
+  mv /boot/kernel* /boot/efi/gentoo.efi
+  mv /boot/init* /boot/efi/gentoo.img
+  mv /boot/intel* /boot/efi/
+  efibootmgr -c -d /dev/nvme0n1p1 -p 1 -b 0001 -L "Gentoo" -l "\gentoo.efi" -u "initrd=\intel-uc.img initrd=\gentoo.img root=LABEL=LXS rootfstype=btrfs rootflags=subvol=/@ rw quiet splash loglevel=3 nowatchdog vt.default_red=48,231,166,229,140,244,129,181,98,231,166,229,140,244,129,165 vt.default_grn=52,130,209,200,170,184,200,191,104,130,209,200,170,184,200,173 vt.default_blu=70,132,137,144,238,228,190,226,128,132,137,144,238,228,190,206"
+  exit
+#+end_src
+** service
+#+begin_src sh :shebang #!/usr/bin/env bash
+  systemctl enable systemd-networkd systemd-resolved systemd-timesyncd
+  systemctl enable iwd bluetooth tlp
+  exit
+#+end_src
+** btrfs
+AVOID SUBVOLUME TO BE CREATED BY SYSTEMD!!!
+#+begin_src sh :shebang #!/usr/bin/env bash
+  rmdir /srv /var/lib/portables /var/lib/machines
+  mkdir /srv /var/lib/portables /var/lib/machines
+  exit
+#+end_src

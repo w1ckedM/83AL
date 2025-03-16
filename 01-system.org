@@ -1,0 +1,465 @@
+#+title: System Configuration
+#+startup: show2levels
+
+* base
+** console - [[file:/etc/vconsole.conf][vconsole.conf]]
+#+begin_src conf :tangle "/doas::/etc/vconsole.conf"
+KEYMAP=us
+#+end_src
+** fs layout - [[file:/etc/fstab][fstab]]
+#+begin_src
+#+end_src
+** hosts - [[file:/etc/hosts][hosts]]
+*** localhost
+#+begin_src conf :tangle "/doas::/etc/hosts"
+127.0.0.1 localhost
+::1 localhost
+#+end_src
+*** github
+#+begin_src conf :tangle "/doas::/etc/hosts"
+# GitHub520 Host Start
+140.82.112.26                 alive.github.com
+140.82.113.5                  api.github.com
+185.199.109.153               assets-cdn.github.com
+185.199.111.133               avatars.githubusercontent.com
+185.199.108.133               avatars0.githubusercontent.com
+185.199.111.133               avatars1.githubusercontent.com
+185.199.111.133               avatars2.githubusercontent.com
+185.199.111.133               avatars3.githubusercontent.com
+185.199.111.133               avatars4.githubusercontent.com
+185.199.111.133               avatars5.githubusercontent.com
+185.199.111.133               camo.githubusercontent.com
+140.82.113.22                 central.github.com
+185.199.111.133               cloud.githubusercontent.com
+140.82.114.10                 codeload.github.com
+140.82.113.21                 collector.github.com
+185.199.108.133               desktop.githubusercontent.com
+185.199.111.133               favicons.githubusercontent.com
+140.82.114.4                  gist.github.com
+52.217.116.241                github-cloud.s3.amazonaws.com
+3.5.28.208                    github-com.s3.amazonaws.com
+3.5.24.44                     github-production-release-asset-2e65be.s3.amazonaws.com
+16.15.217.244                 github-production-repository-file-5c1aeb.s3.amazonaws.com
+3.5.30.47                     github-production-user-asset-6210df.s3.amazonaws.com
+192.0.66.2                    github.blog
+140.82.114.3                  github.com
+140.82.114.17                 github.community
+185.199.110.154               github.githubassets.com
+151.101.193.194               github.global.ssl.fastly.net
+185.199.108.153               github.io
+185.199.111.133               github.map.fastly.net
+185.199.108.153               githubstatus.com
+140.82.114.25                 live.github.com
+185.199.111.133               media.githubusercontent.com
+185.199.111.133               objects.githubusercontent.com
+13.107.42.16                  pipelines.actions.githubusercontent.com
+185.199.111.133               raw.githubusercontent.com
+185.199.111.133               user-images.githubusercontent.com
+140.82.114.21                 education.github.com
+185.199.111.133               private-user-images.githubusercontent.com
+# Update time: 2025-01-26T22:04:58+08:00
+# Update url: https://raw.hellogithub.com/hosts
+# Star me: https://github.com/521xueweihan/GitHub520
+# GitHub520 Host End
+#+end_src
+** hostname - [[file:/etc/hostname][hostname]]
+#+begin_src conf :tangle "/doas::/etc/hostname"
+83AL
+#+end_src
+** locale - [[file:/etc/locale.conf][locale.conf]]
+#+begin_src conf :tangle "/doas::/etc/locale.gen"
+zh_CN.UTF-8 UTF-8
+#+end_src
+** locale - [[file:/etc/locale.gen][locale.gen]]
+#+begin_src conf :tangle "/doas::/etc/locale.gen"
+en_US.UTF-8 UTF-8
+zh_CN.UTF-8 UTF-8
+zh_CN.GBK GBK
+zh_CN.GB2312 GB2312
+#+end_src
+** systemd
+*** auto login - [[file:/etc/systemd/system/getty@tty1.service.d/autologin.conf][autologin.conf]]
+#+begin_src conf :mkdirp yes :tangle "/doas::/etc/systemd/system/getty@tty1.service.d/autologin.conf"
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --skip-login --nonewline --autologin wimi --noclear %I $TERM
+#+end_src
+*** network ethernet - [[file:/etc/systemd/network/20wired.network][20wired.network]]
+#+begin_src conf :mkdirp yes :tangle "/doas::/etc/systemd/network/20wired.network"
+[Match]
+Name=enp0s20f0u7u1
+
+[Network]
+DHCP=yes
+
+[DHCPv4]
+RouteMetric=10
+#+end_src
+*** network wireless - [[file:/etc/systemd/network/30wireless.network][30wireless.network]]
+#+begin_src conf :mkdirp yes :tangle "/doas::/etc/systemd/network/30wireless.network"
+[Match]
+Name=wlan0
+
+[Network]
+DHCP=yes
+
+[DHCPv4]
+RouteMetric=20
+#+end_src
+*** time sync - [[file:/etc/systemd/timesyncd.conf][timesyncd.conf]]
+#+begin_src conf :tangle "/doas::/etc/systemd/timesyncd.conf"
+[Time]
+NTP=cn.ntp.org.cn
+FallbackNTP=ntp1.nimac.cn
+#+end_src
+*** zram generator [[file:/etc/systemd/zram-generator.conf][zram-generator.conf]]
+#+begin_src conf :mkdirp yes :tangle "/doas::/etc/systemd/zram-generator.conf"
+[zram0]
+zram-size = ram
+compression-algorithm = zstd
+swap-priority = 100
+fs-type = swap
+#+end_src
+** cmd
+#+begin_src bash :results output silent
+doas systemctl enable --now systemd-networkd systemd-resolved systemd-timesyncd dev-zram0.swap
+exit
+#+end_src
+* addon
+** doas - [[file:/etc/doas.conf][doas.conf]]
+#+begin_src conf :tangle "/doas::/etc/doas.conf"
+permit nopass keepenv :wheel
+# !!!
+#+end_src
+** bluetooth
+*** main - [[file:/etc/bluetooth/main.conf][main.conf]]
+#+begin_src conf :mkdirp yes :tangle "/doas::/etc/bluetooth/main.conf"
+  [General]
+  AlwaysPairable = false
+  Experimental = true
+  ControllerMode = bredr
+
+  [Policy]
+  AutoEnable=true
+#+end_src
+*** input - [[file:/etc/bluetooth/input.conf][input.conf]]
+#+begin_src conf :mkdirp yes :tangle "/doas::/etc/bluetooth/input.conf"
+  [General]
+  UserspaceHID=true
+#+end_src
+** bluetooth auto connect
+*** script - [[file:/usr/local/bin/bluetooth-autoconnect][bluetooth-autoconnect]]
+#+begin_src python3 :tangle "/doas::/usr/local/bin/bluetooth-autoconnect"
+#!/usr/bin/env python3
+import getopt
+import os
+import signal
+import sys
+import dbus
+
+from dbus.mainloop.glib import DBusGMainLoop
+from functools import partial
+from gi.repository import GLib
+from xml.etree import ElementTree
+
+SCRIPT_NAME = os.path.basename(sys.argv[0])
+
+def dbus_get_child_object_paths(object_path):
+    object_paths = []
+    obj = bus.get_object('org.bluez', object_path, introspect=False)
+    xml_string = obj.Introspect(dbus_interface='org.freedesktop.DBus.Introspectable')
+    if object_path == '/':
+        object_path = ''
+    for child in ElementTree.fromstring(xml_string):
+        if child.tag == 'node':
+            object_paths.append(object_path + '/' + child.attrib['name'])
+    return object_paths
+
+def connect_devices_for_adapter(adapter_path):
+    if verbose:
+        print(f'scanning for devices on {adapter_path}', flush=True)
+    # Get list of devices
+    device_paths = dbus_get_child_object_paths(adapter_path)
+    # Manage pending connections for non-daemon mode
+    def add_pending_connection(device_path):
+        if not daemon:
+            pending_connections.add(device_path)
+    def remove_pending_connection(device_path):
+        if not daemon:
+            pending_connections.discard(device_path)
+            # If this was the last pending connection, terminate the
+            # mainloop
+            if len(pending_connections) == 0:
+                loop.quit()
+    # Handle the async replies for a connection attempt
+    def reply_handler(device_path):
+        print(f'successfully connected to device {device_path}', flush=True)
+        remove_pending_connection(device_path)
+    def error_handler(device_path, e):
+        print(f'error connecting to device {device_path}: {e.get_dbus_message()}', file=sys.stderr, flush=True)
+        remove_pending_connection(device_path)
+    for device_path in device_paths:
+        if verbose:
+            print(f'found device {device_path}', flush=True)
+        try:
+            # Read the device's properties
+            obj = bus.get_object('org.bluez', device_path)
+            props = obj.GetAll(
+                    'org.bluez.Device1',
+                    dbus_interface='org.freedesktop.DBus.Properties')
+            if props.get('Connected', False):
+                if verbose:
+                    print(f'device {device_path} is already connected', flush=True)
+            elif not props.get('Trusted', False):
+                if verbose:
+                    print(f'device {device_path} is not trusted', flush=True)
+            else:
+                print(f'connecting to device {device_path}', flush=True)
+                add_pending_connection(device_path)
+                # Attempt to connect to the device
+                obj.Connect(
+                        dbus_interface='org.bluez.Device1',
+                        reply_handler=partial(reply_handler, device_path),
+                        error_handler=partial(error_handler, device_path))
+        except dbus.exceptions.DBusException as e:
+            error_handler(device_path, e)
+
+def connect_devices_for_all_adapters():
+    if verbose:
+        print('scanning for adapters...', flush=True)
+    # Get a list of adapters
+    adapter_paths = dbus_get_child_object_paths('/org/bluez')
+    for adapter_path in adapter_paths:
+        if verbose:
+            print(f'found adapter {adapter_path}', flush=True)
+        try:
+            # Read the adapter's properties
+            obj = bus.get_object('org.bluez', adapter_path)
+            props = obj.GetAll(
+                    'org.bluez.Adapter1',
+                    dbus_interface='org.freedesktop.DBus.Properties')
+            # We're only interested in adapters that are powered on
+            if props.get('Powered', False):
+                if verbose:
+                    print(f'adapter {adapter_path} is powered on', flush=True)
+                # Try to connect to devices on this adapter
+                connect_devices_for_adapter(adapter_path)
+        except dbus.exceptions.DBusException as e:
+            print(f'error reading properties for adapter {adapter_path}: {e.get_dbus_message()}', file=sys.stderr, flush=True)
+
+def properties_changed_handler(interface_name, changed_properties, invalidated_properties, path):
+    # We're only interested in adapters that have been powered on
+    if interface_name == 'org.bluez.Adapter1' and changed_properties.get('Powered', False):
+        if verbose:
+            print(f'adapter {path} has powered on', flush=True)
+        # Try to connect to devices on this adapter
+        connect_devices_for_adapter(path)
+
+def usage():
+    print('\n'.join([
+        f'Usage: {SCRIPT_NAME} [OPTIONS]...',
+        f'',
+        f'Automatically connect to trusted bluetooth devices',
+        f'',
+        f'OPTIONS:',
+        f'  -d, --daemon      Monitor bluetooth adapters and automatically connect to',
+        f'                    trusted devices when an adapter is powered on',
+        f'  -h, --help        Print this help message',
+        f'  -v, --verbose     Show more detailed log messages',
+        f'',
+    ]), flush=True)
+    sys.exit(0)
+
+def main():
+    global daemon
+    global verbose
+    # Parse command line arguments
+    try:
+        opts, cmds = getopt.getopt(sys.argv[1:], 'dhv', ['daemon', 'help', 'verbose'])
+    except getopt.GetoptError as e:
+        print(f'{SCRIPT_NAME}:', e, file=sys.stderr, flush=True)
+        print(f"Try '{SCRIPT_NAME} --help' for more information", file=sys.stderr, flush=True)
+        sys.exit(1)
+    # Process options (e.g. -h, --verbose)
+    for o, v in opts:
+        if o in ('-d', '--daemon'):
+            daemon = True
+        elif o in ('-h', '--help'):
+            usage()
+        elif o in ('-v', '--verbose'):
+            verbose = True
+        else:
+            # This shouldn't ever happen unless we forget to handle an
+            # option we've added
+            print(f'{SCRIPT_NAME}: internal error: unhandled option {o}', file=sys.stderr, flush=True)
+            sys.exit(1)
+    # Process commands
+    # This script does not use any commands so we will exit if one is
+    # incorrectly provided
+    if len(cmds) > 0:
+        print(f"{SCRIPT_NAME}: command '{c}' not recognized", file=sys.stderr, flush=True)
+        print(f"Try '{SCRIPT_NAME} --help' for more information", file=sys.stderr, flush=True)
+        sys.exit(1)
+    # Set process name and title
+    # This allows commands like `killall SCRIPT_NAME` to function
+    # correctly
+    try:
+        import prctl
+        if verbose:
+            print(f'setting process name to \'{SCRIPT_NAME}\'', flush=True)
+        prctl.set_name(SCRIPT_NAME)
+        prctl.set_proctitle(' '.join(sys.argv))
+    except ImportError:
+        if verbose:
+            print(f'failed to load module \'prctl\'', flush=True)
+            print(f'process name not set', flush=True)
+    if daemon:
+        # Listen for changes on the BlueZ dbus interface
+        # This is a catch all listener (no path specified) because we
+        # want to get notified for all adapters without keeping a list
+        # of them and managing signal handlers independantly
+        bus.add_signal_receiver(
+                properties_changed_handler,
+                signal_name='PropertiesChanged',
+                dbus_interface='org.freedesktop.DBus.Properties',
+                bus_name='org.bluez',
+                path=None,
+                path_keyword='path')
+        # Attempt to connect to devices on all existing adapters
+        connect_devices_for_all_adapters()
+        # Start the mainloop
+        loop.run()
+    else:
+        # Attempt to connect to devices on all existing adapters
+        connect_devices_for_all_adapters()
+        # If we're waiting for connection attemps to finish, start the
+        # mainloop. We will automatically exit the loop once everything
+        # is finished
+        if len(pending_connections) > 0:
+            loop.run()
+
+def signal_handler(sig, frame):
+    if sig == signal.SIGHUP:
+        # Rescan adapters and attempt to connect to devices if we're in
+        # daemon mode
+        if daemon:
+            connect_devices_for_all_adapters()
+    elif sig in (signal.SIGINT, signal.SIGTERM):
+        # Gracefully exit
+        sys.exit(0)
+    else:
+        # This shouldn't ever happen unless we forget to handle a signal
+        # we've added
+        print(f'internal error: unhandled signal {sig}', file=sys.stderr, flush=True)
+        sys.exit(2)
+
+if __name__ == '__main__':
+    # Register signal handlers
+    signal.signal(signal.SIGHUP, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGUSR1, signal.SIG_IGN)
+    signal.signal(signal.SIGUSR2, signal.SIG_IGN)
+    signal.signal(signal.SIGALRM, signal.SIG_IGN)
+    signal.signal(signal.SIGTERM, signal_handler)
+    # Connect to the system dbus
+    DBusGMainLoop(set_as_default=True)
+    bus = dbus.SystemBus()
+    # Initialize globals
+    daemon = False
+    verbose = False
+    pending_connections = set()
+    # Initialize the mainloop, but don't start it yet
+    loop = GLib.MainLoop()
+    main()
+# vim: ft=python ts=8 et sw=4 sts=4
+#+end_src
+*** service - [[file:/etc/systemd/system/bluetooth-autoconnect.service][bluetooth-autoconnect.service]]
+#+begin_src conf :tangle "/doas::/etc/systemd/system/bluetooth-autoconnect.service"
+[Unit]
+Description=Bluetooth autoconnect service
+Before=bluetooth.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/binbluetooth-autoconnect -d
+
+[Install]
+WantedBy=bluetooth.service
+#+end_src
+** dracut - [[file:/etc/dracut.conf][dracut.conf]]
+#+begin_src conf
+hostonly="yes"
+compress="zstd"
+early_microcode="yes"
+#+end_src
+** keyd
+*** default - [[file:/etc/keyd/default.conf][default.conf]]
+#+begin_src conf
+[ids]
+
+,*
+
+[main]
+
+# Ctrl
+#   no need to hold
+control = oneshot(control)
+#   act as Ctrl when held
+#   act as Esc/Return when tapped
+capslock = overload(control, esc)
+enter = overload(control, enter)
+
+# Alt
+#   no need to hold
+alt = oneshot(alt)
+#   act as Alt when held
+#   act as Tab/Backspace when tapped
+tab = overload(alt, tab)
+backspace = overload(alt, backspace)
+
+# Shift
+#   no need to hold
+shift = oneshot(shift)
+
+# Meta
+#   no need to hold
+meta = oneshot(meta)
+#   act as Ctrl when tapped together
+f+j = oneshot(meta)
+
+# Capslock
+esc = capslock
+
+# Extra
+r+u = pageup
+v+m = pagedown
+g+h = home
+d+k = insert
+s+l = del
+a+enter = end
+#+end_src
+** iwd - [[file:/etc/iwd/main.conf][main.conf]]
+#+begin_src conf :tangle "/doas::/etc/iwd/main.conf"
+[Network]
+EnableIPv6=false
+NameResolvingService=systemd
+#+end_src
+** policykit
+*** wheel - [[file:/etc/polkit-1/rules.d/10-admin.rules][10-admin.rules]]
+#+begin_src conf :mkdirp yes :tangle "/doas::/etc/polkit-1/rules.d/10-admin.rules"
+polkit.addAdminRule(function(action, subject) {
+    return ["unix-group:wheel"];
+});
+#+end_src
+** udev [[file:/etc/udev/rules.d/99-vial.rules][99-vial.rules]]
+#+begin_src conf :mkdirp yes :tangle "/doas::/etc/udev/rules.d/99-vial.rules"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", ATTRS{idProduct}=="08f0", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", ATTRS{idProduct}=="d03b", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+#+end_src
+** cmd
+#+begin_src bash :results output silent
+doas systemctl enable --now keyd iwd tlp
+doas systemctl enable --now bluetooth bluetooth-autoconnect.service
+doas usermod -a wimi -G keyd
+exit
+#+end_src

@@ -1,0 +1,27 @@
+#+title: Root Configuration
+#+startup: show2levels
+#+property: header-args :mkdirp yes
+
+* dotfile
+** bashrc
+#+begin_src bash :tangle "/doas::/root/.bashrc" :shebang #!/usr/bin/env bash
+if [[ $- != *i* ]]; then
+    return
+fi
+
+set -o vi
+set -o noclobber
+
+export PATH=$PATH:/usr/local/bin:
+#+end_src
+** [[file:/root/.inputrc][.inputrc]]
+#+begin_src bash :tangle "/doas::/root/.inputrc" :shebang #!/usr/bin/env bash
+set editing-mode vi                                            
+$if mode=vi                
+    # normal mode                           
+    set keymap vi-command                                 
+    # insert mode             
+    set keymap vi-insert                          
+    "jk": vi-movement-mode
+$endif
+#+end_src

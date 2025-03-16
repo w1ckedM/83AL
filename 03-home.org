@@ -1,0 +1,2564 @@
+#+title: Home Configuration
+#+startup: show3levels
+#+property: header-args :mkdirp yes
+
+* base
+** bash
+*** [[file:~/.bashrc][.bashrc]]
+**** default
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+if [[ $- != *i* ]]; then
+    return
+fi
+#+end_src
+**** vi mode
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+set -o vi
+set -o noclobber
+#+end_src
+**** history
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+export HISTSIZE=1000
+export HISTTIMEFORMAT="%Y-%m-%d,%H:%M:%S|"
+export HISTCONTROL="$HISTCONTROL erasedups:ignoreboth"
+#+end_src
+**** var
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+export PATH=$PATH:$HOME/.local/bin:/usr/local/bin:
+export EDITOR="emacsclient -nw"
+export LESSHISTFILE=-
+export CLIPBOARD_LOCALE="zh_CN.UTF-8"
+export CLIPBOARD_TMPDIR="$HOME/.cache"
+export CLIPBOARD_PERSISTDIR="$HOME/.cache"
+export STARSHIP_CONFIG=~/.config/starship/starship.toml
+#+end_src
+**** fzf
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+export FZF_DEFAULT_COMMAND="find -L * -path '*/\.*' -prune -o -type f -print -o -type l -print 2> /dev/null"
+export FZF_DEFAULT_OPTS=" \
+    --color=bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284 \
+    --color=fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf \
+    --color=marker:#f2d5cf,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284"
+#+end_src
+**** control
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+alias cpod="bluetoothctl connect 14:0A:29:77:B1:4E && notify-send 'connecting to Mi Airpod'"
+alias dpod="bluetoothctl disconnect 14:0A:29:77:B1:4E && notify-send 'Mi Airpod has been disconnected'"
+alias cbox="bluetoothctl connect 50:88:11:1C:A7:16 && notify-send 'connecting to Mi Box"
+alias dbox="bluetoothctl disconnect 50:88:11:1C:A7:16 && notify-send 'Mi Box has been disconnected'"
+
+alias bkk='brightnessctl s +5% && notify-send "Brightness up 5%"'
+alias bjj='brightnessctl s 5%- && notify-send "Brightness down 5%"'
+alias bxx='brightnessctl s 100% && notify-send "Brightness set to 100%"'
+
+alias mtt='wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && notify-send "Micro has been toggled"'
+alias mkk='wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%+ && notify-send "Micro up 5%"'
+alias mjj='wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%- && notify-send "Micro down 5%"'
+alias mxx='wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 100% && notify-send "Micro set to 100%"'
+
+alias att="wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && notify-send 'Audio has been toggled'"
+alias akk="wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && notify-send 'Volume down 5%'"
+alias ajj="wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ && notify-send 'Volume up 5%'"
+alias axx="wpctl set-volume @DEFAULT_AUDIO_SINK@ 100% && notify-send 'Volume set to 100%'"
+#+end_src
+**** lazy
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+  alias cp="cp -rf"
+  alias rm="rm -rf"
+  alias mkdir="mkdir -p -v"
+  alias df="df -h"
+  alias du="du -c -h"
+  alias ping="ping -c 5"
+  alias wget="wget --no-hsts"
+  alias bb="bat -n --color=always"
+  alias cn="clitrans"
+  alias hh="tldr"
+  alias ee="emacs -nw"
+  alias ec="emacsclient -nw"
+#+end_src
+**** lazy ls
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+alias l="eza -g --group-directories-first --icons=never --sort Name"
+alias ll="eza -lg --group-directories-first --icons=never --sort Name"
+alias la="eza -ag --group-directories-first --icons=never --sort Name"
+alias lr="eza -agR --group-directories-first --icons=never --sort Name"
+alias lt="eza -T --group-directories-first --icons=never --sort Name"
+alias lla="eza -alg --group-directories-first --icons=never --sort Name"
+#+end_src
+**** lazy portage
+#+begin_src bash
+alias pquu="doas emaint sync -A"
+alias pqss="doas emerge -avuDN @world"
+alias pqa="doas emerge --oneshot"
+alias pqb="equery b"
+alias pqc="doas emerge --depclean"
+alias pqd="equery d"
+alias pqe="cat /var/log/portage/elog/summary.log"
+alias pqf="equery f"
+alias pqg="equery g"
+alias pqi="watch -cn 10 genlop -ci"
+alias pql="equery l"
+alias pqm="equery m"
+alias pqn="doas emerge --oneshot --newuse"
+alias pqq="doas eclean-dist -d"
+alias pqs="doas emerge --search"
+alias pqu="equery u"
+alias pqw="equery w"
+alias pkz="cat /var/lib/portage/world"
+#+end_src
+**** exFAT
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+alias lnl="doas mount -o rw,users,uid=1000,dmask=007,fmask=117 /dev/sda1 /mnt"
+#+end_src
+**** power
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+alias bye="doas shutdown now"
+alias siu="doas reboot"
+alias asap="doas systemctl soft-reboot"
+#+end_src
+**** func proxy
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+function v2p() {
+    export http_proxy='http://127.0.0.1:20171'
+    export https_proxy='http://127.0.0.1:20171'
+    curl cip.cc
+}
+
+function v2off(){
+    unset http_proxy https_proxy
+    curl cip.cc
+}
+#+end_src
+**** func yazi
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+#+end_src
+**** loading
+#+begin_src bash :tangle ~/.bashrc :shebang #!/usr/bin/env bash
+eval "$(fzf --bash)"
+eval "$(starship init bash)"
+eval "$(zoxide init bash)"
+#+end_src
+*** [[file:~/.inputrc][.inputrc]]
+#+begin_src bash :tangle ~/.inputrc :shebang #!/usr/bin/env bash
+set editing-mode vi                                            
+$if mode=vi                
+    # normal mode                           
+    set keymap vi-command                                 
+    # insert mode             
+    set keymap vi-insert                          
+    "jk": vi-movement-mode
+$endif
+#+end_src
+*** [[file:~/.bashjk_logout][.bash_logout]]
+**** default
+#+begin_src bash :tangle ~/.bash_logout :shebang #!/usr/bin/env bash
+clear
+#+end_src
+*** [[file:~/.bash_profile][.bash_profile]]
+**** default
+#+begin_src bash :tangle ~/.bash_profile :shebang #!/usr/bin/env bash
+if [[ -f ~/.bashrc ]]; then
+    . ~/.bashrc
+fi
+#+end_src
+**** nix subsystem
+#+begin_src bash
+if [ -e /home/wimi/.nix-profile/etc/profile.d/nix.sh ]; then
+    . /home/wimi/.nix-profile/etc/profile.d/nix.sh;
+fi
+#+end_src
+**** auto login
+#+begin_src bash :tangle ~/.bash_profile :shebang #!/usr/bin/env bash
+if [[ ! ${DISPLAY} && ${XDG_VTNR} == 1 ]]; then
+    ln -sf ~/.config/waybar/conf/muti.json ~/.config/waybar/config
+    ln -sf ~/.config/hypr/conf/22-output-muti.conf ~/.config/hypr/conf/02-output.conf
+    dbus-run-session Hyprland
+fi
+#+end_src
+** battery
+*** [[~/.config/systemd/user/battery.service][battery.service]]
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/battery.service
+[Unit]
+Description=Warning as low-battery status
+
+[Service]
+Type=oneshot
+ExecStart=/home/wimi/.local/bin/battery-alarm
+
+[Install]
+WantedBy=battery.timer
+#+end_src
+*** [[~/.config/systemd/user/battery.timer][battery.timer]]
+#+begin_src conf :mkdirp yes :tangle ~/.config/systemd/user/battery.timer
+[Unit]
+Description=Periodic battery status checker
+
+[Timer]
+OnActiveSec=1m
+OnUnitActiveSec=1m
+
+[Install]
+WantedBy=timers.target
+#+end_src
+*** script - [[file:~/.local/bin/battery-alarm][battery-alarm]]
+#+begin_src bash :tangle ~/.local/bin/battery-alarm :shebang #!/usr/bin/env bash
+_bat_status=$(cat /sys/class/power_supply/BAT0/status)
+_bat_capacity=$(cat /sys/class/power_supply/BAT0/capacity)
+
+if [[ "${_bat_status}"=="Discharging" && ${_bat_capacity} -lt 20 ]]; then
+    mpv ~/music/'The Little Things.mp3'
+fi
+#+end_src
+*** cmd
+#+begin_src bash :results output silent
+systemctl --user enable --now battery.service battery.timer
+exit
+#+end_src
+** pipewire
+*** cmd
+#+begin_src bash :results output silent
+systemctl --user enable --now pipewire.socket pipewire-pulse.socket pipewire.service wireplumber.service
+doas usermod -a wimi -G pipewire
+exit
+#+end_src
+** mpd
+*** cmd
+#+begin_src bash :results output silent
+systemctl --user enable --now mpd.service
+exit
+#+end_src
+** wireplumber
+*** profile - [[file:~/.config/wireplumber/wireplumber.conf.d/51-alsa-profile.conf][51-alsa-profile.conf]]
+#+begin_src conf :tangle ~/.config/wireplumber/wireplumber.conf.d/51-alsa-profile.conf
+monitor.alsa.rules = [
+  {
+    matches = [
+      {
+        device.name =  "~alsa_card.*"
+      }
+    ]
+    actions = {
+      update-props = {
+        device.profile = "HiFi: Speaker: sink"
+        api.acp.auto-profile = false
+        api.acp.auto-port = false
+      }
+    }
+  }
+]
+#+end_src
+*** laptop - [[file:~/.config/wireplumber/wireplumber.conf.d/51-alsa-laptop.conf][51-alsa-laptop.conf]]
+#+begin_src conf :tangle ~/.config/wireplumber/wireplumber.conf.d/51-alsa-laptop.conf
+monitor.alsa.rules = [
+  {
+    matches = [
+      {
+        node.name =  "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__Speaker__sink"
+      }
+    ]
+    actions = {
+      update-props = {
+        node.nick = "小新"
+        priority.driver = 1050
+        priority.session = 1050
+      }
+    }
+  }
+]
+#+end_src
+*** miair - [[file:~/.config/wireplumber/wireplumber.conf.d/52-bluez-miair.conf][52-bluez-miair.conf]]
+#+begin_src conf :tangle ~/.config/wireplumber/wireplumber.conf.d/52-bluez-miair.conf
+monitor.bluez.rules = [
+  {
+    matches = [
+      {
+        node.name =  "bluez_output.14_0A_29_77_B1_4E.1"
+      }
+    ]
+    actions = {
+      update-props = {
+        node.nick = "小米耳机"
+        priority.driver = 1150
+        priority.session = 1150
+      }
+    }
+  }
+]
+#+end_src
+*** redmi - [[file:~/.config/wireplumber/wireplumber.conf.d/53-bluez-redmi.conf][53-bluez-redmi.conf]]
+#+begin_src conf :tangle ~/.config/wireplumber/wireplumber.conf.d/53-bluez-redmi.conf
+monitor.bluez.rules = [
+  {
+    matches = [
+      {
+        node.name =  "bluez_output.50_88_11_1C_A7_16.1"
+      }
+    ]
+    actions = {
+      update-props = {
+        node.nick = "小米音箱"
+        priority.driver = 1100
+        priority.session = 1100
+      }
+    }
+  }
+]
+#+end_src
+** xdg
+*** dir - [[file:~/.config/user-dirs.dirs][user-dirs.dirs]]
+#+begin_src conf :tangle ~/.config/user-dirs.dirs
+# XDG_CONFIG_DIRS=/etc/xdg
+# XDG_DATA_DIRS=/usr/share
+# XDG_RUNTIME_DIR=/run/user/$UID
+
+XDG_CACHE_HOME=$HOME/.cache
+XDG_CONFIG_HOME=$HOME/.config
+XDG_DATA_HOME=$HOME/.local/share
+XDG_STATE_HOME=$HOME/.local/state
+
+# 下载
+XDG_DOWNLOAD_DIR="$HOME/download"
+# 桌面
+XDG_DESKTOP_DIR="$HOME/desktop"
+# 公共
+XDG_PUBLICSHARE_DIR="$HOME/public"
+# 模板
+XDG_TEMPLATES_DIR="$HOME/template"
+
+# 文档
+XDG_DOCUMENTS_DIR="$HOME/document"
+# 音乐
+XDG_MUSIC_DIR="$HOME/music"
+# 图片
+XDG_PICTURES_DIR="$HOME/picture"
+# 视频
+XDG_VIDEOS_DIR="$HOME/video"
+#+end_src
+*** locale - [[file:~/.config/user-dirs.locale][user-dirs.locale]]
+#+begin_src conf :tangle ~/.config/user-dirs.locale
+en_US
+#+end_src
+*** mime - [[file:~/.config/mimeapps.list][mimeapps.list]]
+#+begin_src conf :tangle ~/.config/mimeapps.list
+[Added Associations]
+image/gif=mpv.desktop
+image/jpeg=mpv.desktop
+image/png=mpv.desktop
+x-scheme-handler/http=brave-browser.desktop
+x-scheme-handler/https=brave-browser.desktop
+x-scheme-handler/tg=org.telegram.desktop.desktop;
+x-scheme-handler/tonsite=org.telegram.desktop.desktop;
+application/pdf=org.pwmt.zathura.desktop
+
+[Default Applications]
+text/html=brave-browser.desktop
+image/gif=mpv.desktop
+image/jpeg=mpv.desktop
+image/png=mpv.desktop
+x-scheme-handler/http=brave-browser.desktop
+x-scheme-handler/https=brave-browser.desktop
+x-scheme-handler/tg=org.telegram.desktop.desktop
+x-scheme-handler/tonsite=org.telegram.desktop.desktop
+application/pdf=org.pwmt.zathura.desktop
+#+end_src
+*** cmd
+#+begin_src bash :dir ~/ :results output silent
+mkdir -p download git picture/screenshot
+ln -sf /home/.@/d document
+ln -sf /home/.@/m music
+ln -sf /home/.@/o org
+ln -sf /home/.@/v video
+ln -sf /home/.@/w wallpaper
+ln -sf /home/.@/c/83AL .dotfile
+ln -sf ~/.config/mimeapps.list ~/.local/share/applications/mimeapps.list
+exit
+#+end_src
+* addon
+** bat
+*** cmd
+#+begin_src bash :dir ~/ :results output silent
+mkdir -p ~/.config/bat/themes
+wget -P ~/.config/bat/themes https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Frappe.tmTheme
+bat cache --build
+#+end_src
+*** config - [[file:~/.config/bat/config][config]]
+#+begin_src conf :tangle ~/.config/bat/config
+--theme="Catppuccin Frappe"
+#+end_src
+** browser
+*** [[https://takeout.google.com/settings/takeout/custom/chrome?pli=1][takeout]]
+**** cmd
+#+begin_src bash :dir ~/download :results output silent
+unzip Takeout*.zip
+exit
+#+end_src
+**** backup file
+1. [[file:~/download/Takeout/Chrome/扩展程序.json][扩展程序]]
+2. [[file:~/download/Takeout/Chrome/设置.json][设置]]
+3. [[file:~/download/Takeout/Chrome/书签.html][书签]]
+*** browser extension
+**** vimium c
+**** dark reader
+**** stylus
+**** switchyomega
+*** [[file:~/.local/bin/braveb][braveb]]
+#+begin_src bash :tangle ~/.local/bin/braveb :shebang #!/usr/bin/env bash
+/opt/brave-bin/brave --enable-features=AcceleratedVideoDecodeLinuxGL \
+  --enable-features=VaapiVideoDecoder,VaapiIgnoreDriverChecks,Vulkan,DefaultANGLEVulkan,VulkanFromANGLE \
+  --enable-features=UseOzonePlatform \
+  --ozone-platform=wayland \
+  --enable-wayland-ime
+#+end_src
+** btop
+*** config - [[file:~/.config/btop/btop.conf][btop.conf]]
+#+begin_src conf :tangle ~/.config/btop/btop.conf
+#? Config file for btop v. 1.4.0
+
+#* Name of a btop++/bpytop/bashtop formatted ".theme" file, "Default" and "TTY" for builtin themes.
+#* Themes should be placed in "../share/btop/themes" relative to binary or "$HOME/.config/btop/themes"
+color_theme = "TTY"
+
+#* If the theme set background should be shown, set to False if you want terminal background transparency.
+theme_background = True
+
+#* Sets if 24-bit truecolor should be used, will convert 24-bit colors to 256 color (6x6x6 color cube) if false.
+truecolor = True
+
+#* Set to true to force tty mode regardless if a real tty has been detected or not.
+#* Will force 16-color mode and TTY theme, set all graph symbols to "tty" and swap out other non tty friendly symbols.
+force_tty = False
+
+#* Define presets for the layout of the boxes. Preset 0 is always all boxes shown with default settings. Max 9 presets.
+#* Format: "box_name:P:G,box_name:P:G" P=(0 or 1) for alternate positions, G=graph symbol to use for box.
+#* Use whitespace " " as separator between different presets.
+#* Example: "cpu:0:default,mem:0:tty,proc:1:default cpu:0:braille,proc:0:tty"
+presets = "cpu:1:default,proc:0:default cpu:0:default,mem:0:default,net:0:default cpu:0:block,net:0:tty"
+
+#* Set to True to enable "h,j,k,l,g,G" keys for directional control in lists.
+#* Conflicting keys for h:"help" and k:"kill" is accessible while holding shift.
+vim_keys = True
+
+#* Rounded corners on boxes, is ignored if TTY mode is ON.
+rounded_corners = True
+
+#* Default symbols to use for graph creation, "braille", "block" or "tty".
+#* "braille" offers the highest resolution but might not be included in all fonts.
+#* "block" has half the resolution of braille but uses more common characters.
+#* "tty" uses only 3 different symbols but will work with most fonts and should work in a real TTY.
+#* Note that "tty" only has half the horizontal resolution of the other two, so will show a shorter historical view.
+graph_symbol = "braille"
+
+# Graph symbol to use for graphs in cpu box, "default", "braille", "block" or "tty".
+graph_symbol_cpu = "default"
+
+# Graph symbol to use for graphs in gpu box, "default", "braille", "block" or "tty".
+graph_symbol_gpu = "default"
+
+# Graph symbol to use for graphs in cpu box, "default", "braille", "block" or "tty".
+graph_symbol_mem = "default"
+
+# Graph symbol to use for graphs in cpu box, "default", "braille", "block" or "tty".
+graph_symbol_net = "default"
+
+# Graph symbol to use for graphs in cpu box, "default", "braille", "block" or "tty".
+graph_symbol_proc = "default"
+
+#* Manually set which boxes to show. Available values are "cpu mem net proc" and "gpu0" through "gpu5", separate values with whitespace.
+shown_boxes = "cpu mem net proc"
+
+#* Update time in milliseconds, recommended 2000 ms or above for better sample times for graphs.
+update_ms = 2000
+
+#* Processes sorting, "pid" "program" "arguments" "threads" "user" "memory" "cpu lazy" "cpu direct",
+#* "cpu lazy" sorts top process over time (easier to follow), "cpu direct" updates top process directly.
+proc_sorting = "cpu lazy"
+
+#* Reverse sorting order, True or False.
+proc_reversed = False
+
+#* Show processes as a tree.
+proc_tree = False
+
+#* Use the cpu graph colors in the process list.
+proc_colors = True
+
+#* Use a darkening gradient in the process list.
+proc_gradient = True
+
+#* If process cpu usage should be of the core it's running on or usage of the total available cpu power.
+proc_per_core = False
+
+#* Show process memory as bytes instead of percent.
+proc_mem_bytes = True
+
+#* Show cpu graph for each process.
+proc_cpu_graphs = True
+
+#* Use /proc/[pid]/smaps for memory information in the process info box (very slow but more accurate)
+proc_info_smaps = False
+
+#* Show proc box on left side of screen instead of right.
+proc_left = False
+
+#* (Linux) Filter processes tied to the Linux kernel(similar behavior to htop).
+proc_filter_kernel = False
+
+#* In tree-view, always accumulate child process resources in the parent process.
+proc_aggregate = False
+
+#* Sets the CPU stat shown in upper half of the CPU graph, "total" is always available.
+#* Select from a list of detected attributes from the options menu.
+cpu_graph_upper = "Auto"
+
+#* Sets the CPU stat shown in lower half of the CPU graph, "total" is always available.
+#* Select from a list of detected attributes from the options menu.
+cpu_graph_lower = "Auto"
+
+#* If gpu info should be shown in the cpu box. Available values = "Auto", "On" and "Off".
+show_gpu_info = "Auto"
+
+#* Toggles if the lower CPU graph should be inverted.
+cpu_invert_lower = True
+
+#* Set to True to completely disable the lower CPU graph.
+cpu_single_graph = False
+
+#* Show cpu box at bottom of screen instead of top.
+cpu_bottom = False
+
+#* Shows the system uptime in the CPU box.
+show_uptime = True
+
+#* Show cpu temperature.
+check_temp = True
+
+#* Which sensor to use for cpu temperature, use options menu to select from list of available sensors.
+cpu_sensor = "Auto"
+
+#* Show temperatures for cpu cores also if check_temp is True and sensors has been found.
+show_coretemp = True
+
+#* Set a custom mapping between core and coretemp, can be needed on certain cpus to get correct temperature for correct core.
+#* Use lm-sensors or similar to see which cores are reporting temperatures on your machine.
+#* Format "x:y" x=core with wrong temp, y=core with correct temp, use space as separator between multiple entries.
+#* Example: "4:0 5:1 6:3"
+cpu_core_map = ""
+
+#* Which temperature scale to use, available values: "celsius", "fahrenheit", "kelvin" and "rankine".
+temp_scale = "celsius"
+
+#* Use base 10 for bits/bytes sizes, KB = 1000 instead of KiB = 1024.
+base_10_sizes = False
+
+#* Show CPU frequency.
+show_cpu_freq = True
+
+#* Draw a clock at top of screen, formatting according to strftime, empty string to disable.
+#* Special formatting: /host = hostname | /user = username | /uptime = system uptime
+clock_format = "%X"
+
+#* Update main ui in background when menus are showing, set this to false if the menus is flickering too much for comfort.
+background_update = True
+
+#* Custom cpu model name, empty string to disable.
+custom_cpu_name = ""
+
+#* Optional filter for shown disks, should be full path of a mountpoint, separate multiple values with whitespace " ".
+#* Begin line with "exclude=" to change to exclude filter, otherwise defaults to "most include" filter. Example: disks_filter="exclude=/boot /home/user".
+disks_filter = ""
+
+#* Show graphs instead of meters for memory values.
+mem_graphs = True
+
+#* Show mem box below net box instead of above.
+mem_below_net = False
+
+#* Count ZFS ARC in cached and available memory.
+zfs_arc_cached = True
+
+#* If swap memory should be shown in memory box.
+show_swap = True
+
+#* Show swap as a disk, ignores show_swap value above, inserts itself after first disk.
+swap_disk = True
+
+#* If mem box should be split to also show disks info.
+show_disks = True
+
+#* Filter out non physical disks. Set this to False to include network disks, RAM disks and similar.
+only_physical = True
+
+#* Read disks list from /etc/fstab. This also disables only_physical.
+use_fstab = True
+
+#* Setting this to True will hide all datasets, and only show ZFS pools. (IO stats will be calculated per-pool)
+zfs_hide_datasets = False
+
+#* Set to true to show available disk space for privileged users.
+disk_free_priv = False
+
+#* Toggles if io activity % (disk busy time) should be shown in regular disk usage view.
+show_io_stat = True
+
+#* Toggles io mode for disks, showing big graphs for disk read/write speeds.
+io_mode = False
+
+#* Set to True to show combined read/write io graphs in io mode.
+io_graph_combined = False
+
+#* Set the top speed for the io graphs in MiB/s (100 by default), use format "mountpoint:speed" separate disks with whitespace " ".
+#* Example: "/mnt/media:100 /:20 /boot:1".
+io_graph_speeds = ""
+
+#* Set fixed values for network graphs in Mebibits. Is only used if net_auto is also set to False.
+net_download = 100
+
+net_upload = 100
+
+#* Use network graphs auto rescaling mode, ignores any values set above and rescales down to 10 Kibibytes at the lowest.
+net_auto = True
+
+#* Sync the auto scaling for download and upload to whichever currently has the highest scale.
+net_sync = True
+
+#* Starts with the Network Interface specified here.
+net_iface = ""
+
+#* Show battery stats in top right if battery is present.
+show_battery = True
+
+#* Which battery to use if multiple are present. "Auto" for auto detection.
+selected_battery = "Auto"
+
+#* Show power stats of battery next to charge indicator.
+show_battery_watts = True
+
+#* Set loglevel for "~/.config/btop/btop.log" levels are: "ERROR" "WARNING" "INFO" "DEBUG".
+#* The level set includes all lower levels, i.e. "DEBUG" will show all logging info.
+log_level = "WARNING"
+
+#* Measure PCIe throughput on NVIDIA cards, may impact performance on certain cards.
+nvml_measure_pcie_speeds = True
+
+#* Horizontally mirror the GPU graph.
+gpu_mirror_graph = True
+
+#* Custom gpu0 model name, empty string to disable.
+custom_gpu_name0 = ""
+
+#* Custom gpu1 model name, empty string to disable.
+custom_gpu_name1 = ""
+
+#* Custom gpu2 model name, empty string to disable.
+custom_gpu_name2 = ""
+
+#* Custom gpu3 model name, empty string to disable.
+custom_gpu_name3 = ""
+
+#* Custom gpu4 model name, empty string to disable.
+custom_gpu_name4 = ""
+
+#* Custom gpu5 model name, empty string to disable.
+custom_gpu_name5 = ""
+#+end_src
+*** fixing pmu warning
+#+begin_src bash :tangle ~/.bash_profile :shebang #!/usr/bin/env bash
+doas setcap cap_perfmon=+ep /usr/bin/btop
+#+end_src
+** fcitx5
+*** config
+**** general - [[file:~/.config/fcitx5/config][config]]
+#+begin_src conf :tangle ~/.config/fcitx5/config
+[Hotkey]
+# 反复按切换键时进行轮换
+EnumerateWithTriggerKeys=True
+# 临时在当前和第一个输入法之间切换
+AltTriggerKeys=
+# 向前切换输入法
+EnumerateForwardKeys=
+# 向后切换输入法
+EnumerateBackwardKeys=
+# 轮换输入法时跳过第一个输入法
+EnumerateSkipFirst=
+# 向前切换输入分组
+EnumerateGroupForwardKeys=
+# 向后切换输入法分组
+EnumerateGroupBackwardKeys=
+# 激活输入法
+ActivateKeys=
+# 取消激活输入法
+DeactivateKeys=
+# 默认跳转前一个候选词
+PrevCandidate=
+# 默认跳转下一个候选词
+NextCandidate=
+# 切换是否使用嵌入预编辑
+TogglePreedit=
+
+[Hotkey/TriggerKeys]
+0=Super+Shift+C
+
+[Hotkey/PrevPage]
+0=Up
+
+[Hotkey/NextPage]
+0=Down
+
+[Behavior]
+# 默认状态为激活
+ActiveByDefault=True
+# 共享输入状态
+ShareInputState=False
+# 在程序中显示预编辑文本
+PreeditEnabledByDefault=False
+# 切换输入法时显示输入法信息
+ShowInputMethodInformation=True
+# 在焦点更改时显示输入法信息
+showInputMethodInformationWhenFocusIn=False
+# 显示紧凑的输入法信息
+CompactInputMethodInformation=True
+# 显示第一个输入法的信息
+ShowFirstInputMethodInformation=True
+# 默认页大小
+DefaultPageSize=9
+# 覆盖 Xkb 选项
+OverrideXkbOption=False
+# 自定义 Xkb 选项
+CustomXkbOption=
+# Force Enabled Addons
+EnabledAddons=
+# Force Disabled Addons
+DisabledAddons=
+# Preload input method to be used by default
+PreloadInputMethod=True
+#+end_src
+**** profile - [[file:~/.config/fcitx5/profile][profile]]
+#+begin_src conf :tangle ~/.config/fcitx5/profile
+[Groups/0]
+# Group Name
+Name=默认
+# Layout
+Default Layout=us
+# Default Input Method
+DefaultIM=rime
+
+[Groups/0/Items/0]
+# Name
+Name=keyboard-us
+# Layout
+Layout=
+
+[Groups/0/Items/1]
+# Name
+Name=rime
+# Layout
+Layout=
+
+[GroupOrder]
+0=默认
+#+end_src
+**** ui - [[file:~/.config/fcitx5/conf/classicui.conf][classicui.conf]]
+#+begin_src conf :tangle ~/.config/fcitx5/conf/classicui.conf
+# 垂直候选列表
+Vertical Candidate List=False
+# 按每个屏幕 DPI 显示
+PerScreenDPI=True
+# 使用鼠标滚轮翻页
+WheelForPaging=False
+# 字体
+Font="LXGW WenKai 14"
+# 菜单字体
+MenuFont="LXGW WenKai 12"
+# 托盘字体
+TrayFont="LXGW WenKai 12"
+# 托盘标签轮廓颜色
+TrayOutlineColor=#c6d0f5
+# 托盘标签文本颜色
+TrayTextColor=#c6d0f5
+# 优先使用文字图标
+PreferTextIcon=True
+# 在图标中显示布局名称
+ShowLayoutNameInIcon=True
+# 使用输入法的语言来显示文字
+UseInputMethodLangaugeToDisplayText=True
+# 主题
+Theme=frappe
+# 固定 Wayland 的字体 DPI
+ForceWaylandDPI=0
+#+end_src
+**** wayland - [[file:~/.config/fcitx5/conf/waylandim.conf][waylandim.conf]]
+#+begin_src conf :tangle ~/.config/fcitx5/conf/waylandim.conf
+# 检测当前运行的程序 (需要重启)
+DetectApplication=True
+#+end_src
+*** color scheme
+**** frappe - [[~/.local/share/fcitx5/themes/frappe/theme.conf][theme.conf]]
+#+begin_src conf :tangle ~/.local/share/fcitx5/themes/frappe/theme.conf
+# vim: ft=dosini
+[Metadata]
+Name=frappe
+ScaleWithDPI=True
+
+[InputPanel]
+# 字体
+Font=LXGW WenKai 14
+# 非选中候选字颜色
+NormalColor=#c6d0f5
+# 选中候选字颜色
+HighlightCandidateColor=#c6d0f5
+# 高亮前景颜色(输入字符颜色)
+HighlightColor=#c6d0f5
+# 输入字符背景颜色
+HighlightBackgroundColor=#303446
+# 间隔
+Spacing=3
+
+[InputPanel/TextMargin]
+# 候选字对左边距
+Left=10
+# 候选字对右边距
+Right=10
+# 候选字向上边距
+Top=6
+# 候选字向下边距
+Bottom=6
+
+[InputPanel/Background]
+Color=#303446
+BorderColor=#c6d0f5
+BorderWidth=1
+
+[InputPanel/Background/Margin]
+Left=2
+Right=2
+Top=2
+Bottom=2
+
+[InputPanel/Highlight]
+Color=#303446
+
+[InputPanel/Highlight/Margin]
+# 高亮区域左边距
+Left=10
+# 高亮区域右边距
+Right=10
+# 高亮区域上边距
+Top=7
+# 高亮区域下边距
+Bottom=7
+
+[Menu]
+Font=LXGW WenKai 12
+NormalColor=#c6d0f5
+Spacing=3
+
+[Menu/Background]
+Color=#303446
+
+[Menu/Background/Margin]
+Left=2
+Right=2
+Top=2
+Bottom=2
+
+[Menu/ContentMargin]
+Left=2
+Right=2
+Top=2
+Bottom=2
+
+[Menu/Highlight]
+Color=#f4b8e4
+
+[Menu/Highlight/Margin]
+Left=10
+Right=10
+Top=5
+Bottom=5
+
+[Menu/Separator]
+Color=#303446
+
+[Menu/CheckBox]
+Image=radio.png
+
+[Menu/SubMenu]
+Image=arrow.png
+
+[Menu/TextMargin]
+Left=5
+Right=5
+Top=5
+Bottom=5
+#+end_src
+*** rime
+**** rime - [[file:~/.local/share/fcitx5/rime/default.custom.yaml][default.custom.yaml]]
+#+begin_src conf :tangle ~/.local/share/fcitx5/rime/default.custom.yaml
+patch:
+    schema_list:
+        - schema: luna_pinyin_simp
+#+end_src
+**** luna pinyin simplified - [[file:~/.local/share/fcitx5/rime/luna_pinyin_simp.custom.yaml][luna_pinyin_simp.custom.yaml]]
+#+begin_src conf :tangle ~/.local/share/fcitx5/rime/luna_pinyin_simp.custom.yaml
+patch:
+    "menu/page_size": 9
+    "switches/@0/reset": 1
+    ascii_composer/good_old_caps_lock: true
+    ascii_composer/switch_key:
+      Caps_Lock: noop
+      Shift_L: noop
+      Shift_R: commit_text
+      Control_L: noop
+      Control_R: noop
+#+end_src
+** fontconfig
+*** line space - [[file:~/.config/fontconfig/conf.d/99-line-spacing.conf][99-line-spacing.conf]]
+#+begin_src conf :tangle ~/.config/fontconfig/conf.d/99-line-spacing.conf
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <match target="pattern">
+    <edit name="line-spacing" mode="assign">
+      <double>20</double>
+    </edit>
+  </match>
+</fontconfig>
+#+end_src
+** go-musicfox
+*** config - [[file:~/.config/go-musicfox/go-musicfox.ini][go-musicfox.ini]]
+#+begin_src conf :tangle ~/.config/go-musicfox/go-musicfox.ini
+  # 启动页配置
+  [startup]
+  # 是否显示启动页
+  show=true
+  # 启动页进度条是否有回弹效果
+  progressOutBounce=true
+  # 启动页时长
+  loadingSeconds=2
+  # 启动页欢迎语
+  welcome=RockIt
+  # 启动时自动签到
+  signin=false
+
+  # 进度条配置
+  [progress]
+  # 进度条已加载字符
+  fullChar=">"
+  fullCharWhenFirst=">"
+  fullCharWhenLast=">"
+  lastFullChar=">"
+  # 进度条未加载字符
+  emptyChar="."
+  emptyCharWhenFirst="."
+  emptyCharWhenLast="."
+  lastEmptyChar="."
+
+  # 主页面配置
+  [main]
+  # 是否显示标题
+  showTitle=true
+  # 加载中提示
+  loadingText=[加载中...]
+  # 歌曲音质，standard,higher,exhigh,lossless,hires
+  songLevel=higher
+  # 主题颜色
+  # 随机
+  # primaryColor=random
+  primaryColor="#89b4fa"
+  # windows,linux下的通知图标
+  notifyIcon="logo.png"
+  # 是否显示歌词
+  showLyric=true
+  # 歌词偏移 ms
+  lyricOffset=0
+  # 显示歌词翻译
+  showLyricTrans=true
+  # 是否显示通知信息
+  showNotify=true
+  # 开启pprof, --pprof时会开启
+  pprofPort=9876
+  # altScreen显示模式
+  altScreen=true
+  # 开启鼠标事件
+  enableMouseEvent=false
+  # 双列显示，开启务必使用等宽字体
+  doubleColumn=true
+  # 下载目录，默认为${MUSICFOX_ROOT}/download
+  downloadDir=~/music
+  downloadLyricDir=
+  # 文件名模板
+  downloadFileNameTpl={{.SongName}}-{{.ArtistName}}.{{.SongType}}
+  # 缓存目录，默认为${MUSICFOX_ROOT}/cache
+  # !!!注意!!! 如果使用mpd,mpd配置中的"music_directory"必须与cacheDir一致
+  cacheDir=
+  # 缓存大小（以MB为单位），0为不使用缓存，-1为不限制，默认为0
+  cacheLimit=0
+  # 是否显示歌单下所有歌曲，默认不开启，仅获取歌单前1000首，开启后可能会占用更多内存（大量歌曲数据）和带宽（会同时发送多个请求获取歌单下歌曲数据）
+  showAllSongsOfPlaylist=false
+  # 动态显示menu行数
+  dynamicMenuRows=false
+
+  [global_hotkey]
+  # 全局快捷键
+  # 格式：键=功能 (https://github.com/go-musicfox/go-musicfox/blob/master/internal/ui/event_handler.go#L15)
+  # ctrl+shift+space=toggle
+
+  [autoplay]
+  # 是否开启自动播放，默认不开启
+  autoPlay=true
+  # 自动播放歌单，dailyReco, like, name:歌单名, no（保持上次退出时的设置，无视offset），默认为dailyReco
+  autoPlayList=dailyReco
+  # 播放偏移，0为第一首，-1为最后一首，默认为0
+  offset=0
+  # 播放模式，listLoop, order, singleLoop, random（无视offset）, intelligent（心动）, last（上次退出时的模式），默认为last
+  playMode=last
+
+  [player]
+  # 播放引擎 beep / mpd(需要安装配置mpd) / osx(Mac可用) / win_media(windows可用)
+  # Mac默认使用osx，windows默认win_media，其他系统默认使用beep（推荐的配置）
+  engine=beep
+  # beep使用的mp3解码器，可选：go-mp3, minimp3 (minimp3更少的CPU占用，但是稳定性不如go-mp3)
+  beepMp3Decoder=go-mp3
+  # 失败重试次数
+  maxPlayErrCount=3
+
+  # mpd配置
+  mpdBin=/usr/bin/mpd
+  # !!!注意!!! 一定要在配置文件中设置pid_file，否则在退出时不会kill掉mpd进程
+  mpdConfigFile=/home/wimi/.config/mpd/mpd.conf
+  # tcp 或 unix
+  mpdNetwork=unix
+  # tcp时填写ip+port(例如:127.0.0.1:1234)，unix时填写socket文件路径
+  mpdAddr=127.0.0.1:6600
+  # 自动启动mpd
+  mpdAutoStart=true
+
+  [unm]
+  # UNM开关
+  switch=true
+  # UNM源: kuwo,kugou,migu,qq
+  sources=kuwo
+  # UNM搜索其他平台限制 0-3
+  searchLimit=0
+  # 解除会员限制
+  enableLocalVip=true
+  # 解除音质限制
+  unlockSoundEffects=true
+  # QQ音乐cookie文件
+  qqCookieFile=
+#+end_src
+** gtk
+*** gtk3
+**** config - [[file:~/.config/gtk-3.0/settings.ini][settings.ini]]
+#+begin_src conf :tangle ~/.config/gtk-3.0/settings.ini
+[Settings]
+#gtk-application-prefer-dark-theme=true
+gtk-theme-name=Catppuccin-Dark-Frappe
+gtk-icon-theme-name=Catppuccin-Frappe
+gtk-font-name=LXGW WenKai 16
+gtk-cursor-theme-name=catppuccin-frappe-light-cursors
+gtk-cursor-theme-size=36
+#+end_src
+**** cmd
+#+begin_src bash :dir ~/.config/gtk-3.0 :results output silent
+ln -sf /home/.@/b/gtk/icons ~/.local/share/icons
+ln -sf /home/.@/b/gtk/themes ~/.local/share/themes
+exit
+#+end_src
+*** gtk4
+**** import from gtk3 - [[file:~/.local/bin/gtk-import][gtk-import]]
+#+begin_src bash :tangle ~/.local/bin/gtk-import :shebang #!/usr/bin/env bash
+config="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-3.0/settings.ini"
+if [ ! -f "$config" ]; then exit 1; fi
+
+gnome_schema="org.gnome.desktop.interface"
+gtk_theme="$(grep 'gtk-theme-name' "$config" | sed 's/.*\s*=\s*//')"
+icon_theme="$(grep 'gtk-icon-theme-name' "$config" | sed 's/.*\s*=\s*//')"
+cursor_theme="$(grep 'gtk-cursor-theme-name' "$config" | sed 's/.*\s*=\s*//')"
+cursor_size="$(grep 'gtk-cursor-theme-size' "$config" | sed 's/.*\s*=\s*//')"
+font_name="$(grep 'gtk-font-name' "$config" | sed 's/.*\s*=\s*//')"
+gsettings set "$gnome_schema" gtk-theme "$gtk_theme"
+gsettings set "$gnome_schema" icon-theme "$icon_theme"
+gsettings set "$gnome_schema" cursor-theme "$cursor_theme"
+gsettings set "$gnome_schema" cursor-size "$cursor_size"
+gsettings set "$gnome_schema" font-name "$font_name"
+#+end_src
+** keyb
+*** config - [[file:~/.config/keyb/config.yml][config.yml]]
+#+begin_src conf :tangle ~/.config/keyb/config.yml
+  settings:
+    keyb_path: "$HOME/.config/keyb/keyb.yml"
+    reverse: false
+    mouse: true
+    search_mode: false
+    sort_keys: false
+    prompt: '快捷键 Keybindings: '
+    prompt_location: "top"
+    placeholder: '...'
+    prefix_sep: '   󰘳    '
+  color:
+    prompt: "#ef9f76"
+    cursor_fg: "#303446"
+    cursor_bg: "#c6d0f5"
+    filter_fg: "#ef9f76"
+    filter_bg: "#303446"
+  keys:
+    quit: q
+    up: k
+    down: j, down
+    first_line: g
+    last_line: G
+    top: H
+    middle: M
+    bottom: L
+    search: /
+    normal: esc
+#+end_src
+*** keybinding - [[file:~/.config/keyb/keyb.yml][keyb.yml]]
+**** hyprland
+#+begin_src conf :tangle ~/.config/keyb/keyb.yml
+  - name: hyprland special
+    prefix: Super + Shift
+    keybinds:
+      - name: bluetooth
+        key: b
+      - name: control
+        key: c
+      - name: keybinding
+        key: k
+      - name: control monitor
+        key: m
+      - name: netease music
+        key: n
+      - name: control power
+        key: q
+      - name: rmpc
+        key: r
+      - name: btop
+        key: t
+      - name: wifi
+        key: w
+      - name: translator
+        key: z
+  - name: hyprland
+    prefix: Super
+    keybinds:
+      - name: term
+        key: Return
+      - name: vscode
+        key: Space
+      - name: focus monitor eDP-1
+        key: a
+      - name: focus workspace tolast
+        key: b
+      - name: cli helper
+        key: c
+      - name: focus monitor HDMI-A-1
+        key: d
+      - name: emacsclient
+        key: e
+      - name: toggle fullscreen
+        key: f
+      - name: select window
+        key: g
+      - name: focus window left
+        key: h
+      - name: web browser
+        key: i
+      - name: focus window down
+        key: j
+      - name: focus window up
+        key: k
+      - name: focus window right
+        key: l
+      - name: move window to 
+        key: m
+      - name: focus workspace next
+        key: n
+      - name: tofi drun
+        key: o
+      - name: focus workspace previous
+        key: p
+      - name: kill active
+        key: q
+      - name: tofi run
+        key: r
+      - name: screent shot
+        key: s
+      - name: toggle opaque
+        key: t
+      - name: zsh
+        key: u
+      - name: hyprsunset
+        key: v
+      - name: toggle panel
+        key: w
+      - name: clipboard
+        key: x
+      - name: file browser
+        key: y
+      - name: toggle monitor eDP-1
+        key: z
+#+end_src
+**** emacs
+#+begin_src conf :tangle ~/.config/keyb/keyb.yml
+#+end_src
+** kitty
+*** config - [[file:~/.config/kitty/kitty.conf][kitty.conf]]
+**** include
+#+begin_src conf :tangle ~/.config/kitty/kitty.conf
+include style.conf
+#+end_src
+**** font
+#+begin_src conf :tangle ~/.config/kitty/kitty.conf
+  font_family      Comic Mono
+  bold_font        auto
+  italic_font      auto
+  bold_italic_font auto
+  font_size 18
+
+  symbol_map U+4e00-U+9fff LXGW WenKai Mono
+
+  # Seti-UI + Custom
+  symbol_map U+E5FA-U+E6AC Symbols Nerd Font
+
+  # Devicons
+  symbol_map U+E700-U+E7C5 Symbols Nerd Font
+
+  # Font Awesome
+  symbol_map U+F000-U+F2E0 Symbols Nerd Font
+
+  # Font Awesome Extension
+  symbol_map U+E200-U+E2A9 Symbols Nerd Font
+
+  # Material Design Icons
+  symbol_map U+F0001-U+F1AF0 Symbols Nerd Font
+
+  # Weather
+  symbol_map U+E300-U+E3E3 Symbols Nerd Font
+
+  # Octicons
+  symbol_map U+F400-U+F532,U+2665,U+26A1 Symbols Nerd Font
+
+  # Powerline Symbols
+  symbol_map U+E0A0-U+E0A2,U+E0B0-U+E0B3 Symbols Nerd Font
+
+  # Powerline Extra Symbols
+  symbol_map U+E0A3,U+E0B4-U+E0C8,U+E0CA,U+E0CC-U+E0D4 Symbols Nerd Font
+
+  # IEC Power Symbols
+  symbol_map U+23FB-U+23FE,U+2B58 Symbols Nerd Font
+
+  # Font Logos
+  symbol_map U+F300-U+F32F Symbols Nerd Font
+
+  # Pomicons
+  symbol_map U+E000-U+E00A Symbols Nerd Font
+
+  # Codicons
+  symbol_map U+EA60-U+EBEB Symbols Nerd Font
+
+  # Additional sets
+  symbol_map U+E276C-U+E2771 Symbols Nerd Font # Heavy Angle Brackets
+  symbol_map U+2500-U+259F Symbols Nerd Font # Box Drawing
+
+  # Some symbols not covered by Symbols Nerd Font
+  # nonicons contains icons in the range: U+F101-U+F27D
+  # U+F167 is HTML logo, but YouTube logo in Symbols Nerd Font
+  symbol_map U+F102,U+F116-U+F118,U+F12F,U+F13E,U+F1AF,U+F1BF,U+F1CF,U+F1FF,U+F20F,U+F21F-U+F220,U+F22E-U+F22F,U+F23F,U+F24F,U+F25F nonicons
+#+end_src
+**** cursor & bell
+#+begin_src conf :tangle ~/.config/kitty/kitty.conf
+remember_window_size no
+cursor_shape block
+enable_audio_bell no
+#+end_src
+**** copy&paste
+#+begin_src conf :tangle ~/.config/kitty/kitty.conf
+copy_on_select yes
+map shift+insert paste_from_clipboard
+#+end_src
+*** color scheme - [[file:~/.config/kitty/style.conf][style.conf]]
+#+begin_src conf :tangle ~/.config/kitty/style.conf
+# The basic colors
+foreground              #c6d0f5
+background              #303446
+selection_foreground    #303446
+selection_background    #f2d5cf
+
+# Cursor colors
+cursor                  #f2d5cf
+cursor_text_color       #303446
+
+# URL underline color when hovering with mouse
+url_color               #f2d5cf
+
+# Kitty window border colors
+active_border_color     #babbf1
+inactive_border_color   #737994
+bell_border_color       #e5c890
+
+# OS Window titlebar colors
+wayland_titlebar_color system
+macos_titlebar_color system
+
+# Tab bar colors
+active_tab_foreground   #232634
+active_tab_background   #ca9ee6
+inactive_tab_foreground #c6d0f5
+inactive_tab_background #292c3c
+tab_bar_background      #232634
+
+# Colors for marks (marked text in the terminal)
+mark1_foreground #303446
+mark1_background #babbf1
+mark2_foreground #303446
+mark2_background #ca9ee6
+mark3_foreground #303446
+mark3_background #85c1dc
+
+# The 16 terminal colors
+
+# black
+color0 #51576d
+color8 #626880
+
+# red
+color1 #e78284
+color9 #e78284
+
+# green
+color2  #a6d189
+color10 #a6d189
+
+# yellow
+color3  #e5c890
+color11 #e5c890
+
+# blue
+color4  #8caaee
+color12 #8caaee
+
+# magenta
+color5  #f4b8e4
+color13 #f4b8e4
+
+# cyan
+color6  #81c8be
+color14 #81c8be
+
+# white
+color7  #b5bfe2
+color15 #a5adce
+#+end_src
+** mpd
+*** config - [[file:~/.config/mpd/mpd.conf][mpd.conf]]
+#+begin_src conf :tangle ~/.config/mpd/mpd.conf
+  music_directory		"~/music"
+  playlist_directory	"~/.config/mpd/playlist"
+  db_file		        "~/.config/mpd/database"
+  auto_update	        "yes"
+  follow_outside_symlinks	"yes"
+  follow_inside_symlinks	"yes"
+  filesystem_charset	"UTF-8"
+  #metadata_to_use	"artist,album,title,track,name,genre,date,composer,performer,disc"
+
+  audio_output {
+          type            "pipewire"
+          name            "PipeWire Sound Server"
+  }
+#+end_src
+** mpv
+*** config - [[file:~/.config/mpv/mpv.conf][mpv.conf]]
+#+begin_src conf :tangle ~/.config/mpv/mpv.conf
+# background
+background-color='#30344680'
+
+# image
+image-display-duration=inf
+
+# video
+save-position-on-quit=yes
+geometry=50%x50%
+autofit-smaller=66%x66%
+hwdec=vaapi
+ytdl-format=bestvideo[height<=1080][ext=mp4]+bestaudio/best
+
+# wayland
+vo=gpu
+gpu-api=vulkan
+gpu-context=waylandvk
+vulkan-swap-mode=fifo
+vulkan-async-transfer=yes
+vulkan-async-compute=yes
+#+end_src
+*** key binding - [[file:~/.config/mpv/input.conf][input.conf]]
+#+begin_src conf :tangle ~/.config/mpv/input.conf
+k add volume 5
+j add volume -5
+m cycle mute
+
+l seek  5
+h seek -5
+c cycle-values loop-file "inf" "no"
+space cycle pause
+
+n playlist-next
+p playlist-prev
+
+f cycle fullscreen
+r cycle_values video-rotate 90 180 270 0
+q quit
+#+end_src
+** rmpc
+*** cmd
+#+begin_src bash :results output silent
+  mkdir ~/.config/rmpc
+  rmpc config > ~/.config/rmpc/config.ron
+  exit
+#+end_src
+** starship
+*** config - [[file:~/.config/starship/starship.toml][starship.toml]]
+#+begin_src conf :tangle ~/.config/starship/starship.toml
+#format = """$username$hostname$directory$all$character"""
+format = """
+$username\
+$hostname\
+$directory\
+$all\
+$character\
+"""
+right_format = """
+$status\
+$cmd_duration\
+"""
+add_newline = false
+command_timeout=200
+scan_timeout = 10
+palette = "catppuccin_frappe"
+
+[line_break]
+disabled = true
+[fill]
+symbol = ' '
+[username]
+disabled = false
+show_always = false
+format = "[$user]($style)@"
+aliases = { "wimi" = "me" }
+[hostname]
+disabled = false
+ssh_only = false
+format = "∷ [$ssh_symbol$hostname]($style) "
+aliases = { "83AL" = "laptop" }
+[directory]
+disabled = false
+truncation_length = 9
+truncation_symbol = '.../'
+truncate_to_repo = false
+format = "[$path](bold blue) "
+[status]
+disabled = false
+format = " [$symbol$user]($style)"
+[cmd_duration]
+disabled = false
+show_milliseconds = true
+format = " [$duration]($style)"
+[palettes.catppuccin_frappe]
+rosewater = "#f2d5cf"
+flamingo = "#eebebe"
+pink = "#f4b8e4"
+mauve = "#ca9ee6"
+red = "#e78284"
+maroon = "#ea999c"
+peach = "#ef9f76"
+yellow = "#e5c890"
+green = "#a6d189"
+teal = "#81c8be"
+sky = "#99d1db"
+sapphire = "#85c1dc"
+blue = "#8caaee"
+lavender = "#babbf1"
+text = "#c6d0f5"
+subtext1 = "#b5bfe2"
+subtext0 = "#a5adce"
+overlay2 = "#949cbb"
+overlay1 = "#838ba7"
+overlay0 = "#737994"
+surface2 = "#626880"
+surface1 = "#51576d"
+surface0 = "#414559"
+base = "#303446"
+mantle = "#292c3c"
+crust = "#232634"
+#+end_src
+** tmux
+*** config - [[file:~/.config/tmux/tmux.conf][tmux.conf]]
+#+begin_src conf :tangle ~/.config/tmux/tmux.conf
+
+# 基础配置
+set-option -g default-shell /bin/zsh #默认shell
+set -g mouse on #激活鼠标
+setw -g mode-keys vi
+
+# 快捷键
+# leader
+unbind C-b
+set-option -g prefix M-S-d
+set-option -g prefix2 M-S-k
+# function
+bind R source-file ~/.config/tmux/tmux.conf
+bind T clock-mode
+# panel
+bind b split-window -v
+bind r split-window -h
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Configure the catppuccin plugin
+set -g @catppuccin_flavor "frappe"
+set -g @catppuccin_window_status_style "rounded"
+
+# Load catppuccin
+run ~/.config/tmux/plugins/catppuccin/catppuccin.tmux
+set -g status-right-length 100
+set -g status-left-length 100
+set -g status-left ""
+set -g status-right "#{E:@catppuccin_status_application}"
+set -ag status-right "#{E:@catppuccin_status_session}"
+set -ag status-right "#{E:@catppuccin_status_uptime}"
+#+end_src
+** v2raya
+*** cmd
+#+begin_src bash :dir ~/ :results output silent
+doas systemctl enable --now v2raya.service
+systemctl --user enable --now v2raya-lite.service
+#+end_src
+** yazi
+*** config - [[file:~/.config/yazi/yazi.toml][yazi.toml]]
+#+begin_src conf :tangle ~/.config/yazi/yazi.toml
+  [opener]
+  edit = [
+      { run = 'kitty emacsclient -nw "$@"', orphan = true},
+  ]
+  open = [
+      { run = 'xdg-open "$@"', orphan = true},
+  ]
+#+end_src
+*** theme - [[file:~/.config/yazi/theme.toml][theme.toml]]
+#+begin_src conf :tangle ~/.config/yazi/theme.toml
+[manager]
+cwd = { fg = "#81c8be" }
+
+# Hovered
+hovered         = { fg = "#303446", bg = "#8caaee" }
+preview_hovered = { fg = "#303446", bg = "#c6d0f5" }
+
+# Find
+find_keyword  = { fg = "#e5c890", italic = true }
+find_position = { fg = "#f4b8e4", bg = "reset", italic = true }
+
+# Marker
+marker_copied   = { fg = "#a6d189", bg = "#a6d189" }
+marker_cut      = { fg = "#e78284", bg = "#e78284" }
+marker_selected = { fg = "#8caaee", bg = "#8caaee" }
+
+# Tab
+tab_active   = { fg = "#303446", bg = "#c6d0f5" }
+tab_inactive = { fg = "#c6d0f5", bg = "#51576d" }
+tab_width    = 1
+
+# Count
+count_copied   = { fg = "#303446", bg = "#a6d189" }
+count_cut      = { fg = "#303446", bg = "#e78284" }
+count_selected = { fg = "#303446", bg = "#8caaee" }
+
+# Border
+border_symbol = "│"
+border_style  = { fg = "#838ba7" }
+
+# Highlighting
+syntect_theme = "~/.config/yazi/Catppuccin-frappe.tmTheme"
+
+[status]
+separator_open  = ""
+separator_close = ""
+separator_style = { fg = "#51576d", bg = "#51576d" }
+
+# Mode
+mode_normal = { fg = "#303446", bg = "#8caaee", bold = true }
+mode_select = { fg = "#303446", bg = "#a6d189", bold = true }
+mode_unset  = { fg = "#303446", bg = "#eebebe", bold = true }
+
+# Progress
+progress_label  = { fg = "#ffffff", bold = true }
+progress_normal = { fg = "#8caaee", bg = "#51576d" }
+progress_error  = { fg = "#e78284", bg = "#51576d" }
+
+# Permissions
+permissions_t = { fg = "#8caaee" }
+permissions_r = { fg = "#e5c890" }
+permissions_w = { fg = "#e78284" }
+permissions_x = { fg = "#a6d189" }
+permissions_s = { fg = "#838ba7" }
+
+[input]
+border   = { fg = "#8caaee" }
+title    = {}
+value    = {}
+selected = { reversed = true }
+
+[pick]
+border   = { fg = "#8caaee" }
+active   = { fg = "#f4b8e4" }
+inactive = {}
+
+[tasks]
+border  = { fg = "#8caaee" }
+title   = {}
+hovered = { underline = true }
+
+[which]
+mask            = { bg = "#414559" }
+cand            = { fg = "#81c8be" }
+rest            = { fg = "#949cbb" }
+desc            = { fg = "#f4b8e4" }
+separator       = "  "
+separator_style = { fg = "#626880" }
+
+[help]
+on      = { fg = "#f4b8e4" }
+exec    = { fg = "#81c8be" }
+desc    = { fg = "#949cbb" }
+hovered = { bg = "#626880", bold = true }
+footer  = { fg = "#51576d", bg = "#c6d0f5" }
+
+[filetype]
+
+rules = [
+	# Media
+	{ mime = "image/*", fg = "#81c8be" },
+	{ mime = "{audio,video}/*", fg = "#e5c890" },
+
+	# Archives
+  { mime = "application/{,g}zip", fg = "#f4b8e4" },
+	{ mime = "application/{tar,bzip*,7z-compressed,xz,rar}", fg = "#f4b8e4" },
+
+	# Fallback
+	{ name = "*", fg = "#c6d0f5" },
+	{ name = "*/", fg = "#8caaee" }
+]
+
+[icon]
+
+files = [
+  { name = "gulpfile.js", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = ".babelrc", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "copying.lesser", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = ".npmrc", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "docker-compose.yml", text = "󰡨", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "svelte.config.js", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "copying", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "prettier.config.ts", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "gruntfile.babel.js", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = ".SRCINFO", text = "󰣇", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = ".xinitrc", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "docker-compose.yaml", text = "󰡨", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "nuxt.config.ts", text = "󱄆", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "build", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = ".editorconfig", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "nuxt.config.mjs", text = "󱄆", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = ".gitlab-ci.yml", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "PKGBUILD", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = ".bash_profile", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = ".bashrc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "compose.yml", text = "󰡨", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "eslint.config.cjs", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "go.mod", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = ".mailmap", text = "󰊢", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "gtkrc", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "go.work", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "justfile", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "kritadisplayrc", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "commitlint.config.js", text = "󰜘", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = ".env", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "PrusaSlicerGcodeViewer.ini", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "r", text = "󰟔", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "license", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = ".gitignore", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "tailwind.config.js", text = "󱏿", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = ".prettierrc.yml", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = ".zprofile", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = ".zshenv", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "xmonad.hs", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = ".eslintignore", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "tsconfig.json", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = ".prettierrc.json5", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = ".ds_store", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "gulpfile.coffee", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "R", text = "󰟔", fg_dark = "#626880", fg_light = "#626880" },
+  { name = ".zshrc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = ".prettierrc.toml", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = ".gvimrc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = ".xsession", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = ".justfile", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = ".gitconfig", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "gradle-wrapper.properties", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "ionic.config.json", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "cantorrc", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = ".gleam", text = "", fg_dark = "#f4b8e4", fg_light = "#f4b8e4" },
+  { name = "package-lock.json", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "package.json", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "hyprland.conf", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "gulpfile.babel.js", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = ".nvmrc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = ".prettierignore", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "ext_typoscript_setup.txt", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "QtProject.conf", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "avif", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "mix.lock", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "build.gradle", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "gemfile$", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = ".vimrc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "i18n.config.ts", text = "󰗊", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "gulpfile.ts", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "build.zig.zon", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "checkhealth", text = "󰓙", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "xmobarrc", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "_vimrc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = ".luaurc", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "kdenlive-layoutsrc", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "gradlew", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "xsettingsd.conf", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "vlcrc", text = "󰕼", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "xorg.conf", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "xmobarrc.hs", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "workspace", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = ".gitattributes", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "favicon.ico", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "go.sum", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "pom.xml", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "webpack", text = "󰜫", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "vagrantfile$", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "unlicense", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "tmux.conf.local", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "settings.gradle", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = ".dockerignore", text = "󰡨", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "sym-lib-table", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "_gvimrc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "kdenliverc", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "kdeglobals", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = ".prettierrc.yaml", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "rmd", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "tailwind.config.mjs", text = "󱏿", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "sxhkdrc", text = "", fg_dark = "#232634", fg_light = "#232634" },
+  { name = "robots.txt", text = "󰚩", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "tailwind.config.ts", text = "󱏿", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "prettier.config.mjs", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "mpv.conf", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "py.typed", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "PrusaSlicer.ini", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "procfile", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "rakefile", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "kritarc", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = ".Xresources", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "prettier.config.js", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "commitlint.config.ts", text = "󰜘", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "weston.ini", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "eslint.config.js", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "cmakelists.txt", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = ".git-blame-ignore-revs", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "config", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "nuxt.config.cjs", text = "󱄆", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "node_modules", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "makefile", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "lxqt.conf", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "i18n.config.js", text = "󰗊", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "FreeCAD.conf", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "prettier.config.cjs", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "tmux.conf", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "kalgebrarc", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "i3status.conf", text = "", fg_dark = "#c6d0f5", fg_light = "#c6d0f5" },
+  { name = ".settings.json", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "containerfile", text = "󰡨", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "i3blocks.conf", text = "", fg_dark = "#c6d0f5", fg_light = "#c6d0f5" },
+  { name = "lxde-rc.xml", text = "", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "gradle.properties", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "hypridle.conf", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "gruntfile.ts", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "gruntfile.js", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "dockerfile", text = "󰡨", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "groovy", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "hyprlock.conf", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = ".prettierrc", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "gnumakefile", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "commit_editmsg", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "fp-lib-table", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "fp-info-cache", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "eslint.config.ts", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "nuxt.config.js", text = "󱄆", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "platformio.ini", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = ".nuxtrc", text = "󱄆", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "gruntfile.coffee", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "eslint.config.mjs", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "compose.yaml", text = "󰡨", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "bspwmrc", text = "", fg_dark = "#232634", fg_light = "#232634" },
+  { name = "brewfile", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = ".eslintrc", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = ".gtkrc-2.0", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = ".Xauthority", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = ".prettierrc.json", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = ".npmignore", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = ".gitmodules", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+]
+exts = [
+  { name = "rake", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "skp", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "eln", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "razor", text = "󱦘", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "vue", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "sln", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "el", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "blp", text = "󰺾", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "jl", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "mdx", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "jsx", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "ml", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "less", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "pot", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "pl", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "mli", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "gif", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "aif", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "cxxm", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "fcbak", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "aac", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "query", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "android", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "m3u8", text = "󰲹", fg_dark = "#ea999c", fg_light = "#ea999c" },
+  { name = "leex", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "liquid", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "cue", text = "󰲹", fg_dark = "#ea999c", fg_light = "#ea999c" },
+  { name = "fcmacro", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "log", text = "󰌱", fg_dark = "#c6d0f5", fg_light = "#c6d0f5" },
+  { name = "pm", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "brep", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "blend", text = "󰂫", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "md5", text = "󰕥", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "sql", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "xcplayground", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "erb", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "t", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "cache", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "r", text = "󰟔", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "x", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "import", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "m", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "lrc", text = "󰨖", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "o", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "d", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "c", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "h", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "rss", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "hbs", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "godot", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "eot", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "awk", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "fsx", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "a", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "pyi", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "asc", text = "󰦝", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "ass", text = "󰨖", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "css", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "psb", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "csproj", text = "󰪮", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "csv", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "gcode", text = "󰐫", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "ics", text = "", fg_dark = "#303446", fg_light = "#303446" },
+  { name = "mk", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "bz", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "fctb", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "gz", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "wasm", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "glb", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "elc", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "flf", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "elf", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "dropbox", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "tres", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "apk", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "ape", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "slvs", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "apl", text = "⍝", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "cs", text = "󰌛", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "azcli", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "pp", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "flc", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "gemspec", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "pls", text = "󰲹", fg_dark = "#ea999c", fg_light = "#ea999c" },
+  { name = "cfg", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "fcscript", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "gnumakefile", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "zst", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "pxi", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "woff2", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "kicad_pcb", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "zsh", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "kicad_wks", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "info", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "cppm", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "svg", text = "󰜡", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "flac", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "cuh", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "bin", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "zig", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "yml", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "yaml", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "fsscript", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "xz", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "diff", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "mojo", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "cshtml", text = "󱦗", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "bak", text = "󰁯", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "nfo", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "bat", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "cpy", text = "⚙", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "gql", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "c++", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "lff", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "obj", text = "󰆧", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "sha512", text = "󰕥", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "scm", text = "󰘧", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "aiff", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "sig", text = "λ", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "webm", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "zip", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "wrz", text = "󰆧", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "jwmrc", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "xml", text = "󰗀", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "cbl", text = "⚙", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "rmd", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "xaml", text = "󰙳", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "xm", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "wvc", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "drl", text = "", fg_dark = "#ea999c", fg_light = "#ea999c" },
+  { name = "erl", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "3gp", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "ccm", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "ino", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "kbx", text = "󰯄", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "test.js", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "wrl", text = "󰆧", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "pcm", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "woff", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "scala", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "webpack", text = "󰜫", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "hrl", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "kra", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "kicad_pro", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "bazel", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "toml", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "iges", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "crdownload", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "so", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "strings", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "xls", text = "󰈛", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "wav", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "vsix", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "kicad_prl", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "mov", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "bash", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "sqlite3", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "vsh", text = "", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "vim", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "lck", text = "", fg_dark = "#b5bfe2", fg_light = "#b5bfe2" },
+  { name = "go", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "pyo", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "vhdl", text = "󰍛", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "vhd", text = "󰍛", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "rar", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "magnet", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "vala", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "coffee", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "kdbx", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "po", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "v", text = "󰍛", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "prisma", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "f90", text = "󱈚", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "txt", text = "󰈙", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "mo", text = "∞", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "mp4", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "cljc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "heex", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "exs", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "clj", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "luau", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "fcparam", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "markdown", text = "", fg_dark = "#c6d0f5", fg_light = "#c6d0f5" },
+  { name = "dxf", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "luac", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "desktop", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "docx", text = "󰈬", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "cljd", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "txz", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "bicepparam", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "kt", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "fcstd", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "md", text = "", fg_dark = "#c6d0f5", fg_light = "#c6d0f5" },
+  { name = "edn", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "sub", text = "󰨖", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "ttf", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "tsx", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "hurl", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "dll", text = "", fg_dark = "#232634", fg_light = "#232634" },
+  { name = "lhs", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "tsconfig", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "msf", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "ts", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "rproj", text = "󰗆", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "org", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "signature", text = "λ", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "elm", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "pyc", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "tmux", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "tgz", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "nu", text = ">", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "tfvars", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "lua", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "astro", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "lib", text = "", fg_dark = "#232634", fg_light = "#232634" },
+  { name = "tex", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "ogg", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "stp", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "sublime", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "test.tsx", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "nswag", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "test.ts", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "test.jsx", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "dwg", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "bib", text = "󱉟", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "sass", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "templ", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "tcl", text = "󰛓", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "pck", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "swift", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "makefile", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "xcstrings", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "slim", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "iso", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "fsi", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "dart", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "nix", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "svelte", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "sv", text = "󰍛", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "bz2", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "sha256", text = "󰕥", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "twig", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "material", text = "󰔉", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "ppt", text = "󰈧", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "pyd", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "step", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "hx", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "webmanifest", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "kicad_sch", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "cjs", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "stl", text = "󰆧", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "ejs", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "ssa", text = "󰨖", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "license", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "jsonc", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "download", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "ige", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "sqlite", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "psd1", text = "󰨊", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "dump", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "resi", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "spec.ts", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "fnl", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "cu", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "scss", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "config.ru", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "psd", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "db", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "epub", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "haml", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "sol", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "sml", text = "λ", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "svh", text = "󰍛", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "sldprt", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "ico", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "xlsx", text = "󰈛", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "rs", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "dconf", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "bz3", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "fdmdownload", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "fs", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "patch", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "hs", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "xcf", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "js", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "pyw", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "sha384", text = "󰕥", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "fcmat", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "csh", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "suo", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "sha224", text = "󰕥", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "sha1", text = "󰕥", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "cr", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "huff", text = "󰡘", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "sh", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "sc", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "ksh", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "cc", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "wma", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "mp3", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "conf", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "3mf", text = "󰆧", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "sbt", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "kicad_mod", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "terminal", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "rlib", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "pdf", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "mts", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "kdenlive", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "kts", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "spec.tsx", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "res", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "hxx", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "rb", text = "", fg_dark = "#292c3c", fg_light = "#292c3c" },
+  { name = "vh", text = "󰍛", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "ixx", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "cson", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "cts", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "7z", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "ex", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "cpp", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "qss", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "app", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "jxl", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "qrc", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "qml", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "epp", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "otf", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "hh", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "qm", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "pro", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "exe", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "kdenlivetitle", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "kdb", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "mpp", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "Dockerfile", text = "󰡨", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "bqn", text = "⎉", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "torrent", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "m3u", text = "󰲹", fg_dark = "#ea999c", fg_light = "#ea999c" },
+  { name = "py", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "pxd", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "f3d", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "out", text = "", fg_dark = "#414559", fg_light = "#414559" },
+  { name = "spec.jsx", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "kicad_dru", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "ps1", text = "󰨊", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "ui", text = "", fg_dark = "#303446", fg_light = "#303446" },
+  { name = "styl", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "f#", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "png", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "ply", text = "󰆧", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "php", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "eex", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "tbc", text = "󰛓", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "part", text = "", fg_dark = "#81c8be", fg_light = "#81c8be" },
+  { name = "pub", text = "󰷖", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "ipynb", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "opus", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "git", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "bmp", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "blade.php", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "nim", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "xpi", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "mustache", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "tscn", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "scad", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "ai", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "hex", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "hpp", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "xul", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "mobi", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "fcstd1", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "ical", text = "", fg_dark = "#303446", fg_light = "#303446" },
+  { name = "icalendar", text = "", fg_dark = "#303446", fg_light = "#303446" },
+  { name = "bicep", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "mm", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "mkv", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "graphql", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "mjs", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "mint", text = "󰌪", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "m4v", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "m4a", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "tf", text = "", fg_dark = "#626880", fg_light = "#626880" },
+  { name = "gv", text = "󱁉", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "lock", text = "", fg_dark = "#b5bfe2", fg_light = "#b5bfe2" },
+  { name = "krz", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "kpp", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "ko", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "kicad_sym", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "psm1", text = "󰨊", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "pyx", text = "", fg_dark = "#8caaee", fg_light = "#8caaee" },
+  { name = "json5", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "json", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "bzl", text = "", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "ifb", text = "", fg_dark = "#303446", fg_light = "#303446" },
+  { name = "image", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "jpg", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "jpeg", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+  { name = "java", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "wv", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "ini", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "cast", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "cp", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "fctl", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "ifc", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "sldasm", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "html", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "typoscript", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "🔥", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "htm", text = "", fg_dark = "#e78284", fg_light = "#e78284" },
+  { name = "ste", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "spec.js", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "gresource", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "ebook", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "gradle", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "gd", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "fish", text = "", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "igs", text = "󰻫", fg_dark = "#a6d189", fg_light = "#a6d189" },
+  { name = "fbx", text = "󰆧", fg_dark = "#838ba7", fg_light = "#838ba7" },
+  { name = "env", text = "", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "srt", text = "󰨖", fg_dark = "#e5c890", fg_light = "#e5c890" },
+  { name = "dot", text = "󱁉", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "doc", text = "󰈬", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "d.ts", text = "", fg_dark = "#ef9f76", fg_light = "#ef9f76" },
+  { name = "applescript", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "cxx", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "img", text = "", fg_dark = "#f2d5cf", fg_light = "#f2d5cf" },
+  { name = "cljs", text = "", fg_dark = "#85c1dc", fg_light = "#85c1dc" },
+  { name = "cobol", text = "⚙", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "cob", text = "⚙", fg_dark = "#51576d", fg_light = "#51576d" },
+  { name = "cmake", text = "", fg_dark = "#737994", fg_light = "#737994" },
+  { name = "webp", text = "", fg_dark = "#ca9ee6", fg_light = "#ca9ee6" },
+]
+#+end_src
+** zsh
+*** zsh - [[file:~/.zshrc][.zshrc]]
+**** zim
+#+begin_src conf :tangle ~/.zshrc
+# Env
+ZDOTDIR=~/.config/zsh
+ZIM_CONFIG_FILE=~/.config/zsh/zimrc
+ZIM_HOME=~/.local/share/zim
+# Download zimfw plugin manager if missing.
+if [[ ! -e ${ZIM_HOME}/zimfw.zsh ]]; then
+  curl -fsSL --create-dirs -o ${ZIM_HOME}/zimfw.zsh \
+      https://github.com/zimfw/zimfw/releases/latest/download/zimfw.zsh
+fi
+# Install missing modules and update ${ZIM_HOME}/init.zsh if missing or outdated.
+if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} ]]; then
+  source ${ZIM_HOME}/zimfw.zsh init -q
+fi
+# Initialize modules.
+source ${ZIM_HOME}/init.zsh
+#+end_src
+**** keybinding
+#+begin_src conf :tangle ~/.zshrc
+ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+#+end_src
+**** history
+#+begin_src conf :tangle ~/.zshrc
+HISTSIZE=1000
+HISTTIMEFORMAT="%Y-%m-%d,%H:%M:%S|"
+HISTCONTROL="$HISTCONTROL erasedups:ignoreboth"
+#+end_src
+**** var
+#+begin_src conf :tangle ~/.zshrc
+PATH=$PATH:$HOME/.local/bin:/usr/local/bin:
+EDITOR="emacsclient -nw"
+LESSHISTFILE=-
+STARSHIP_CONFIG=~/.config/starship/starship.toml
+#+end_src
+**** fzf
+#+begin_src conf :tangle ~/.zshrc
+FZF_DEFAULT_COMMAND="find -L * -path '*/\.*' -prune -o -type f -print -o -type l -print 2> /dev/null"
+FZF_DEFAULT_OPTS=" \
+    --color=bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284 \
+    --color=fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf \
+    --color=marker:#f2d5cf,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284"
+#+end_src
+**** lazy ls
+#+begin_src conf :tangle ~/.zshrc
+alias l="eza -g --group-directories-first --icons=never --sort Name"
+alias ll="eza -lg --group-directories-first --icons=never --sort Name"
+alias la="eza -ag --group-directories-first --icons=never --sort Name"
+alias lr="eza -agR --group-directories-first --icons=never --sort Name"
+alias lt="eza -T --group-directories-first --icons=never --sort Name"
+alias lla="eza -alg --group-directories-first --icons=never --sort Name"
+#+end_src
+**** lazy gentoo
+#+begin_src conf
+alias pquu="doas emaint sync -A"
+alias pqss="doas emerge -avuDN @world"
+alias pqa="doas emerge --oneshot"
+alias pqb="equery b"
+alias pqc="doas emerge --depclean"
+alias pqd="equery d"
+alias pqe="cat /var/log/portage/elog/summary.log"
+alias pqf="equery f"
+alias pqg="equery g"
+alias pqi="watch -cn 10 genlop -ci"
+alias pql="equery l"
+alias pqm="equery m"
+alias pqn="doas emerge --oneshot --newuse"
+alias pqq="doas eclean-dist -d"
+alias pqs="doas emerge --search"
+alias pqu="equery u"
+alias pqw="equery w"
+alias pkz="cat /var/lib/portage/world"
+#+end_src
+**** lazy !!!
+#+begin_src conf :tangle ~/.zshrc
+alias cp="cp -rf"
+alias rm="rm -rf"
+alias mkdir="mkdir -p -v"
+#+end_src
+**** lazy command
+#+begin_src conf :tangle ~/.zshrc
+  alias df="df -h"
+  alias du="du -c -h"
+  alias ping="ping -c 5"
+  alias wget="wget --no-hsts"
+  alias lnl="doas mount -o rw,users,uid=1000,dmask=007,fmask=117 /dev/sda1 /mnt"
+  alias bb="bat -n --color=always"
+  alias cn="clitrans"
+  alias hh="tldr"
+  alias ee="emacs -nw"
+  alias ec="emacsclient -nw"
+#+end_src
+**** lazy power
+#+begin_src conf :tangle ~/.zshrc
+alias bye="doas shutdown now"
+alias siu="doas reboot"
+alias asap="doas systemctl soft-reboot"
+#+end_src
+**** lazy control
+#+begin_src conf :tangle ~/.zshrc
+alias cpod="bluetoothctl connect 14:0A:29:77:B1:4E && notify-send 'connecting to Mi Airpod'"
+alias dpod="bluetoothctl disconnect 14:0A:29:77:B1:4E && notify-send 'Mi Airpod has been disconnected'"
+alias cbox="bluetoothctl connect 50:88:11:1C:A7:16 && notify-send 'connecting to Mi Box"
+alias dbox="bluetoothctl disconnect 50:88:11:1C:A7:16 && notify-send 'Mi Box has been disconnected'"
+
+alias bkk='brightnessctl s +5% && notify-send "Brightness up 5%"'
+alias bjj='brightnessctl s 5%- && notify-send "Brightness down 5%"'
+alias bxx='brightnessctl s 100% && notify-send "Brightness set to 100%"'
+
+alias mtt='wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && notify-send "Micro has been toggled"'
+alias mkk='wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%+ && notify-send "Micro up 5%"'
+alias mjj='wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%- && notify-send "Micro down 5%"'
+alias mxx='wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 100% && notify-send "Micro set to 100%"'
+
+alias att="wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && notify-send 'Audio has been toggled'"
+alias akk="wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && notify-send 'Volume down 5%'"
+alias ajj="wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ && notify-send 'Volume up 5%'"
+alias axx="wpctl set-volume @DEFAULT_AUDIO_SINK@ 100% && notify-send 'Volume set to 100%'"
+#+end_src
+**** func yazi
+#+begin_src conf :tangle ~/.zshrc
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+#+end_src
+**** func proxy
+#+begin_src conf :tangle ~/.zshrc
+function v2p() {
+    export http_proxy='http://127.0.0.1:20171'
+    export https_proxy='http://127.0.0.1:20171'
+    curl cip.cc
+}
+function v2off(){
+    unset http_proxy https_proxy
+    curl cip.cc
+}
+#+end_src
+**** loading
+#+begin_src conf :tangle ~/.zshrc
+source <(fzf --zsh)
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
+#+end_src
+*** zimfw - [[file:~/.config/zsh/zimrc][zimrc]]
+#+begin_src conf :tangle ~/.config/zsh/zimrc
+  ZDOTDIR=~/.config/zsh
+  ZIM_CONFIG_FILE=~/.config/zsh/zimrc
+  # default
+  zmodule environment
+  zmodule input
+  zmodule utility
+  # vi
+  zmodule jeffreytse/zsh-vi-mode
+  # completion
+  zmodule zsh-users/zsh-completions --fpath src
+  zmodule completion
+  # addon
+  zmodule zsh-users/zsh-syntax-highlighting
+  zmodule zsh-users/zsh-autosuggestions
+#+end_src
+* pending
+** pcmanfm
+*** libfm - [[file:~/.config/libfm/libfm.conf][libfm.conf]]
+#+begin_src conf
+[config]
+single_click=0
+use_trash=0
+confirm_del=1
+confirm_trash=1
+advanced_mode=0
+si_unit=1
+force_startup_notify=1
+backup_as_hidden=1
+no_usb_trash=1
+no_child_non_expandable=0
+show_full_names=1
+only_user_templates=0
+template_run_app=0
+template_type_once=0
+auto_selection_delay=600
+drop_default_action=auto
+defer_content_test=0
+quick_exec=0
+show_internal_volumes=0
+thumbnail_local=1
+thumbnail_max=10240
+smart_desktop_autodrop=1
+
+[ui]
+big_icon_size=160
+small_icon_size=96
+pane_icon_size=64
+thumbnail_size=96
+show_thumbnail=1
+shadow_hidden=0
+
+[places]
+places_home=1
+places_desktop=1
+places_root=1
+places_computer=1
+places_trash=0
+places_applications=0
+places_network=1
+places_unmounted=1
+#+end_src
+*** pcmanfm - [[file:~/.config/pcmanfm/default/pcmanfm.conf][pcmanfm.conf]]
+#+begin_src conf
+[config]
+bm_open_method=0
+
+[volume]
+mount_on_startup=1
+mount_removable=1
+autorun=1
+
+[ui]
+always_show_tabs=0
+max_tab_chars=32
+win_width=640
+win_height=480
+maximized=1
+splitter_pos=342
+media_in_new_tab=0
+desktop_folder_new_win=0
+change_tab_on_drop=1
+close_on_unmount=1
+focus_previous=0
+side_pane_mode=places
+view_mode=icon
+show_hidden=0
+sort=name;ascending;
+toolbar=newtab;navigation;home;
+show_statusbar=1
+pathbar_mode_buttons=0
+#+end_src
+*** preview
+**** ffmpeg - [[file:~/.local/share/thumbnailers/ffmpegthumbnailer.thumbnailer][ffmpegthumbnailer.thumbnailer]]
+#+begin_src conf
+[Thumbnailer Entry]
+TryExec=ffmpegthumbnailer
+Exec=ffmpegthumbnailer -i %i -o %o -s %s -f
+MimeType=video/jpeg;video/mp4;video/mpeg;video/quicktime;video/x-ms-asf;video/x-ms-wm;video/x-ms-wmv;video/x-ms-asx;video/x-ms-wmx;video/x-ms-wvx;video/x-msvideo;video/x-flv;video/x-matroska;application/mxf;video/3gp;video/3gpp;video/dv;video/divx;video/fli;video/flv;video/mp2t;video/mp4v-es;video/msvideo;video/ogg;video/vivo;video/vnd.divx;video/vnd.mpegurl;video/vnd.rn-realvideo;application/vnd.rn-realmedia;video/vnd.vivo;video/webm;video/x-anim;video/x-avi;video/x-flc;video/x-fli;video/x-flic;video/x-m4v;video/x-mpeg;video/x-mpeg2;video/x-nsv;video/x-ogm+ogg;video/x-theora+ogg
+#+end_src
+** vscode
+*** [[file:~/.local/bin/code][code]]
+#+begin_src bash
+codium --ozone-platform=wayland \
+  --enable-wayland-ime
+#+end_src
+** zathura
+*** config - [[file:~/.config/zathura/zathurarc][zathurarc]]
+#+begin_src conf
+include themes/frappe
+set adjust-open "width"
+set font "LXGW WenKai Mono 14"
+#+end_src
+*** theme
+**** frappe - [[file:~/.config/zathura/themes/frappe][frappe]]
+#+begin_src conf
+set default-fg                rgba(198,208,245,1)
+set default-bg 			          rgba(48,52,70,1)
+
+set completion-bg		          rgba(65,69,89,1)
+set completion-fg		          rgba(198,208,245,1)
+set completion-highlight-bg	  rgba(87,82,104,1)
+set completion-highlight-fg	  rgba(198,208,245,1)
+set completion-group-bg		    rgba(65,69,89,1)
+set completion-group-fg		    rgba(140,170,238,1)
+
+set statusbar-fg		          rgba(198,208,245,1)
+set statusbar-bg		          rgba(65,69,89,1)
+
+set notification-bg		        rgba(65,69,89,1)
+set notification-fg		        rgba(198,208,245,1)
+set notification-error-bg	    rgba(65,69,89,1)
+set notification-error-fg	    rgba(231,130,132,1)
+set notification-warning-bg	  rgba(65,69,89,1)
+set notification-warning-fg	  rgba(250,227,176,1)
+
+set inputbar-fg			          rgba(198,208,245,1)
+set inputbar-bg 		          rgba(65,69,89,1)
+
+set recolor                   "true"
+set recolor-lightcolor		    rgba(48,52,70,1)
+set recolor-darkcolor		      rgba(198,208,245,1)
+
+set index-fg			            rgba(198,208,245,1)
+set index-bg			            rgba(48,52,70,1)
+set index-active-fg		        rgba(198,208,245,1)
+set index-active-bg		        rgba(65,69,89,1)
+
+set render-loading-bg		      rgba(48,52,70,1)
+set render-loading-fg		      rgba(198,208,245,1)
+
+set highlight-color		        rgba(87,82,104,0.5)
+set highlight-fg              rgba(244,184,228,0.5)
+set highlight-active-color	  rgba(244,184,228,0.5)
+#+end_src

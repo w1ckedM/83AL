@@ -1,0 +1,347 @@
+#+title: Portage Configuration
+#+startup: show3levels
+#+PROPERTY: header-args :mkdirp yes
+
+* repo
+** default - [[file:/etc/portage/repos.conf][repos.conf]]
+#+begin_src conf :tangle "/doas::/etc/portage/repos.conf"
+[DEFAULT]
+main-repo = gentoo
+
+[gentoo]
+location = /var/db/repos/gentoo
+sync-type = git
+sync-uri = https://mirrors.ustc.edu.cn/gentoo.git
+#+end_src
+** local - [[file:/etc/portage/repos.conf][repos.conf]]
+#+begin_src conf :tangle "/doas::/etc/portage/repos.conf"
+[local]
+location = /var/db/repos/local
+#+end_src
+** 3rd party - [[file:repos.conf][repos.conf]]
+#+begin_src conf :tangle "/doas::/etc/portage/repos.conf"
+[guru]
+location = /var/db/repos/guru
+sync-type = git
+sync-uri = https://github.com/gentoo-mirror/guru.git
+[gentoo-zh]
+location = /var/db/repos/gentoo-zh
+sync-type = git
+sync-uri = https://github.com/gentoo-mirror/gentoo-zh.git
+#+end_src
+** binary - [[file:binrepos.conf][binrepos.conf]]
+#+begin_src conf :tangle "/doas::/etc/portage/binrepos.conf"
+[binhost]
+priority = 1
+sync-uri = https://mirrors.ustc.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64-v3/
+#+end_src
+* common
+** make - [[file:make.conf][make.conf]]
+*** profile
+#+begin_src conf :tangle "/doas::/etc/portage/make.conf"
+ACCEPT_LICENSE="*"
+ACCEPT_KEYWORDS="~amd64"
+#+end_src
+*** compile flag
+#+begin_src conf :tangle "/doas::/etc/portage/make.conf"
+COMMON_FLAGS="-march=alderlake -O2 -flto -pipe -fomit-frame-pointer -falign-functions=32"
+CFLAGS="${COMMON_FLAGS} -fdata-sections -ffunction-sections"
+CXXFLAGS="${COMMON_FLAGS}"
+FCFLAGS="${COMMON_FLAGS}"
+FFLAGS="${COMMON_FLAGS}"
+LDFLAGS="${COMMON_FLAGS}"
+RUSTFLAGS="-C debuginfo=0 -C codegen-units=1 -C target-cpu=native -C opt-level=3"
+#+end_src
+*** feature
+#+begin_src conf :tangle "/doas::/etc/portage/make.conf"
+FEATURES="candy noman nodoc noinfo notitles fixlafiles unmerge-orphans"
+FEATURES="${FEATURES} parallel-fetch parallel-install"
+#+end_src
+*** emerge
+#+begin_src conf :tangle "/doas::/etc/portage/make.conf"
+MAKEOPTS=" -j12 -l12"
+EMERGE_DEFAULT_OPTS=" --with-bdeps=y --quiet-build=y --complete-graph=y --autounmask-write=y"
+EMERGE_DEFAULT_OPTS="${EMERGE_DEFAULT_OPTS} --ask --deep --verbose --keep-going"
+EMERGE_DEFAULT_OPTS="${EMERGE_DEFAULT_OPTS} --binpkg-respect-use=y --getbinpkg"
+#+end_src
+*** use flag
+#+begin_src conf :tangle "/doas::/etc/portage/make.conf"
+USE="-debug -doc -examples -handbook -man -test"
+USE="${USE} -ipv6"
+USE="${USE} -gnome -kde -qt5 qt6"
+USE="${USE} asm clang cxx jit lto minimal openmp pgo threads"
+USE="${USE} bzip2 cjk zlib zstd"
+USE="${USE} bluetooth dbus policykit systemd udev"
+USE="${USE} -X cairo opengl vaapi vulkan wayland"
+USE="${USE} alsa pipewire pulseaudio"
+USE="${USE} aac flac mp3 mp4"
+USE="${USE} -jpeg2k -svg jpeg png tiff"
+#USE="${USE} dist-kernel ffmpeg imagemagick udisks x264 screencast"
+#+end_src
+*** use expand
+#+begin_src conf :tangle "/doas::/etc/portage/make.conf"
+LUA_SINGLE_TARGET="lua5-4"
+LUA_TARGETS="lua5-4"
+PYTHON_SINGLE_TARGET="python3_11"
+PYTHON_TARGETS="python3_11"
+RUBY_SINGLE_TARGET="ruby31"
+RUBY_TARGETS="ruby31"
+LLVM_TARGETS="X86"
+LLVM_SLOT="19"
+L10N="en-US zh-CN en zh"
+#+end_src
+*** use expand - hardware
+#+begin_src conf :tangle "/doas::/etc/portage/make.conf"
+CPU_FLAGS_X86="aes avx avx2 f16c fma3 mmx mmxext pclmul popcnt rdrand sha sse sse2 sse3 sse4_1 sse4_2 ssse3"
+VIDEO_CARDS="intel"
+INPUT_DEVICES="libinput"
+MICROCODE_SIGNATURES="-s 0x000b06a2"
+#+end_src
+*** pending
+#+begin_src conf :tangle "/doas::/etc/portage/make.conf"
+#PORTAGE_SCHEDULING_POLICY="idle"
+#+end_src
+** env
+*** gcc-failsafe - [[file:env/gcc-failsafe][env/gcc-failsafe]]
+#+begin_src conf :tangle "/doas::/etc/portage/env/gcc-failsafe"
+COMMON_FLAGS="-march=native -O2 -pipe -fomit-frame-pointer"
+CFLAGS="${COMMON_FLAGS}"
+CXXFLAGS="${COMMON_FLAGS}"
+FCFLAGS="${COMMON_FLAGS}"
+FFLAGS="${COMMON_FLAGS}"
+LDFLAGS="${COMMON_FLAGS}"
+MAKEOPTS="-j8 -l8"
+#+end_src
+* portage
+** default
+*** profile - [[file:profile/packages][packages]]
+#+begin_src conf :tangle "/doas::/etc/portage/profile/packages"
+-*app-editors/nano
+*app-admin/doas
+*app-editors/neovim
+*dev-vcs/git
+*net-wireless/bluez
+*net-wireless/iw
+*net-wireless/iwd
+*sys-boot/efibootmgr
+*sys-fs/btrfs-progs
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+app-crypt/gnupg -smartcard
+app-editors/neovim lua_single_target_luajit -lua_single_target_lua5-1
+app-text/xmlto text
+dev-lua/lpeg lua_targets_luajit
+dev-lua/luv lua_single_target_luajit -lua_single_target_lua5-4
+dev-lua/mpack lua_targets_luajit
+sys-auth/pambase -passwdqc
+sys-libs/zlib minizip
+#+end_src
+** kernel
+*** profile - [[file:profile/packages][packages]]
+#+begin_src conf :tangle "/doas::/etc/portage/profile/packages"
+*sys-firmware/intel-microcode
+*sys-firmware/sof-firmware
+*sys-kernel/gentoo-kernel
+*sys-kernel/linux-firmware
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+sys-firmware/intel-microcode -dist-kernel hostonly
+#sys-kernel/gentoo-kernel savedconfig
+#sys-kernel/linux-firmware savedconfig
+sys-kernel/installkernel dracut
+#+end_src
+*** kernel snippet - [[file:/etc/kernel/config.d/83al.config][83al.config]]
+#+begin_src conf :tangle "/doas::/etc/kernel/config.d/83al.config"
+CONFIG_LOCALVERSION="-83al"
+CONFIG_DEFAULT_HOSTNAME="(none)"
+# CONFIG_KERNEL_GZIP is not set
+# CONFIG_KERNEL_BZIP2 is not set
+# CONFIG_KERNEL_LZMA is not set
+# CONFIG_KERNEL_XZ is not set
+# CONFIG_KERNEL_LZO is not set
+# CONFIG_KERNEL_LZ4 is not set
+CONFIG_KERNEL_ZSTD=y
+# CONFIG_RD_GZIP is not set
+# CONFIG_RD_BZIP2 is not set
+# CONFIG_RD_LZMA is not set
+# CONFIG_RD_XZ is not set
+# CONFIG_RD_LZO is not set
+# CONFIG_RD_LZ4 is not set
+CONFIG_RD_ZSTD=y
+CONFIG_PROCESSOR_SELECT=y
+CONFIG_CPU_SUP_INTEL=y
+# CONFIG_CPU_SUP_AMD is not set
+# CONFIG_CPU_SUP_HYGON is not set
+# CONFIG_CPU_SUP_CENTAUR is not set
+# CONFIG_CPU_SUP_ZHAOXIN is not set
+# CONFIG_VIRTUALIZATION is not set
+# CONFIG_HYPERVISOR_GUEST is not set
+# CONFIG_GENTOO_LINUX_INIT_SCRIPT is not set
+CONFIG_GENTOO_LINUX_INIT_SYSTEMD=y
+#+end_src
+** base
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+app-misc/brightnessctl
+app-misc/keyd
+app-portage/gentoolkit
+app-portage/portage-utils
+net-misc/socat
+net-misc/yt-dlp
+net-proxy/v2rayA
+sys-apps/usbutils
+sys-apps/zram-generator
+sys-fs/exfatprogs
+sys-kernel/modprobed-db
+sys-power/tlp
+
+app-misc/tealdeer
+app-shells/fzf
+app-shells/zoxide
+sys-apps/bat
+sys-apps/eza
+sys-apps/fd
+sys-apps/ripgrep
+sys-fs/duf
+sys-process/btop
+sys-process/procs
+
+app-misc/tmux
+app-shells/bash-completion
+app-shells/starship
+app-shells/zsh
+dev-util/shellcheck-bin
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+net-proxy/v2rayA xray
+net-wireless/bluez experimental
+#+end_src
+** devel
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+dev-util/pkgdev
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+sys-devel/gcc -fortran graphite pgo
+#+end_src
+*** env - [[file:package.env][package.env]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.env"
+llvm-core/clang gcc-failsafe
+llvm-core/clang-common gcc-failsafe
+llvm-core/clang-runtime gcc-failsafe
+llvm-core/clang-toolchain-symlinks gcc-failsafe
+llvm-core/libclc gcc-failsafe
+llvm-core/llvm gcc-failsafe
+llvm-core/llvm-common gcc-failsafe
+llvm-core/llvm-toolchain-symlinks gcc-failsafe
+llvm-core/llvmgold gcc-failsafe
+llvm-runtimes/compiler-rt gcc-failsafe
+llvm-runtimes/compiler-rt-sanitizers gcc-failsafe
+llvm-runtimes/libcxx gcc-failsafe
+llvm-runtimes/libunwind gcc-failsafe
+llvm-runtimes/openmp gcc-failsafe
+#+end_src
+*** mask - [[file:package.mask][package.mask]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.mask"
+>=dev-lang/python-3.12.0
+#+end_src
+** emacs
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+app-editors/emacs
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+app-editors/emacs -gmp -xpm gtk gui tree-sitter
+app-emacs/emacs-common gui
+gnome-base/librsvg -vala
+media-libs/libglvnd X
+#+end_src
+** hyprland
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+app-misc/cliphist
+gui-apps/hyprlock
+gui-apps/hyprpaper
+gui-apps/hyprshot
+gui-apps/hyprsunset
+gui-apps/mako
+#gui-apps/swww
+gui-apps/tofi
+gui-apps/waybar
+gui-libs/xdg-desktop-portal-hyprland
+gui-wm/hyprland
+sys-auth/hyprpolkitagent
+sys-fs/udiskie
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+dev-cpp/gtkmm X
+dev-cpp/cairomm X
+dev-libs/libdbusmenu gtk3
+gnome-base/gvfs mtp
+gui-apps/waybar -libinput -logind experimental mpris network tray wifi
+gui-wm/hyprland -qtutils
+media-libs/libepoxy X
+x11-libs/cairo X
+x11-libs/gtk+ X
+#+end_src
+** cjk
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+app-i18n/fcitx-gtk
+app-i18n/fcitx-qt
+app-i18n/fcitx-rime
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+dev-util/google-perftools -minimal
+#+end_src
+** font
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+media-fonts/symbols-nerd-font
+media-fonts/lxgw-wenkai
+media-fonts/sarasa-term-sc-nerd
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+media-fonts/fontawesome ttf -otf
+#+end_src
+** gui
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+app-text/zathura-meta
+media-libs/libva-intel-media-driver
+media-video/libva-utils
+mpv-plugin/mpv-mpris
+www-client/brave-bin
+x11-apps/igt-gpu-tools
+x11-terms/kitty
+#+end_src
+*** use - [[file:package.use][package.use]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.use"
+media-video/mpv -opengl
+media-video/pipewire extra pipewire-alsa sound-server
+#+end_src
+*** mask - [[file:package.mask][package.mask]]
+#+begin_src conf :tangle "/doas::/etc/portage/package.mask"
+#>=dev-libs/libfmt-11.0
+#+end_src
+** tui
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+app-misc/yazi
+media-sound/cmus
+media-sound/go-musicfox
+media-sound/pulsemixer
+#+end_src
+** AI
+*** pkg - [[file:/var/lib/portage/world][world]]
+#+begin_src conf :tangle "/doas::/var/lib/portage/world"
+dev-python/requests
+#+end_src

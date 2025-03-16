@@ -1,0 +1,39 @@
+#+title: Sub System Configuration
+#+startup: show2levels
+
+* nix
+** install
+#+begin_src bash :results output silent
+doas chmod -R wimi:wheel /nix
+sh <(curl https://mirrors.tuna.tsinghua.edu.cn/nix/latest/install)
+exit
+#+end_src
+** config
+*** channel - [[file:~/.nix-channels][nix-channels]]
+#+begin_src conf :tangle ~/.nix-channels
+https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
+#+end_src
+*** nix - [[file:~/.config/nix/nix.conf][nix.conf]]
+#+begin_src conf :mkdirp yes :tangle ~/.config/nix/nix.conf
+substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/
+experimental-features = nix-command flakes
+#+end_src
+*** nixpkgs - [[file:~/.config/nixpkgs/config.nix][config.nix]]
+#+begin_src conf :mkdirp yes :tangle ~/.config/nixpkgs/config.nix
+{ allowUnfree = true; }
+#+end_src
+
+* flatpak
+** config
+#+begin_src bash :results output silent
+flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+latpak --user remote-modify flathub --url=https://mirror.sjtu.edu.cn/flathub
+exit
+#+end_src
+** application
+1. com.google.Chrome
+2. org.telegram.desktop
+3. com.obsproject.Studio
+4. com.discordapp.Discord
+5. com.valvesoftware.Steam
+6. org.qutebrowser.qutebrowser
