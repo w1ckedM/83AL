@@ -15,7 +15,8 @@
   VerbosePkgLists
   ParallelDownloads = 5
   DownloadUser = alpm
-  SigLevel    = Required DatabaseOptional
+  SigLevel    = Never
+  #SigLevel    = Required DatabaseOptional
   LocalFileSigLevel = Optional
 
   [core-x86-64-v3]
