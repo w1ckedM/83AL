@@ -134,26 +134,25 @@ monitor= eDP-1, preferred, 2560x0,1.5
 #+end_src
 *** input device - [[file:~/.config/hypr/conf/02-input.conf][02-input.conf]]
 #+begin_src conf :tangle ~/.config/hypr/conf/02-input.conf
-input {
-  follow_mouse = 2
-  # -1.0 - 1.0, 0 means no modification.
-  sensitivity = 0
-  touchpad {
-    disable_while_typing = false
-    natural_scroll = no
-    tap-to-click = true
-    drag_lock = true
-    tap-and-drag = true
+  input {
+    follow_mouse = 2
+    sensitivity = 0
+    touchpad {
+      disable_while_typing = false
+      natural_scroll = true
+      tap-to-click = true
+      drag_lock = true
+      tap-and-drag = true
+    }
   }
-}
-gestures {
-  workspace_swipe = true
-  workspace_swipe_fingers = 3
-  workspace_swipe_create_new = false
-}
-cursor{
-  inactive_timeout = 3
-}
+  gestures {
+    workspace_swipe = true
+    workspace_swipe_fingers = 3
+    workspace_swipe_create_new = false
+  }
+  cursor{
+    inactive_timeout = 3
+  }
 #+end_src
 *** layout - [[file:~/.config/hypr/conf/03-layout.conf][03-layout.conf]]
 #+begin_src conf :tangle ~/.config/hypr/conf/03-layout.conf
