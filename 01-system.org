@@ -397,7 +397,7 @@ early_microcode="yes"
 #+begin_src conf
 [ids]
 
-,*
+*
 
 [main]
 
@@ -454,7 +454,7 @@ polkit.addAdminRule(function(action, subject) {
 ** udev [[file:/etc/udev/rules.d/99-vial.rules][99-vial.rules]]
 #+begin_src conf :mkdirp yes :tangle "/doas::/etc/udev/rules.d/99-vial.rules"
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", ATTRS{idProduct}=="08f0", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
-KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", ATTRS{idProduct}=="d03b", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", ATTRS{idProduct}=="d030", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
 #+end_src
 ** cmd
 #+begin_src bash :results output silent
