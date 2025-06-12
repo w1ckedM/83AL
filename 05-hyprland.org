@@ -354,17 +354,6 @@ binde = $mainMod shift, z, togglespecialworkspace, en-zh
 #+end_src
 **** window
 #+begin_src conf :tangle ~/.config/hypr/conf/06-submap.conf
-# move active window to monitor/direction
-#bind = $mainMod, ?, submap, 移动当前窗口至[ x ]笔电[ m ]主屏[ k ]上[ j ]下[ h ]左[ l ]右
-#submap = 移动当前窗口至[ x ]笔电[ m ]主屏[ k ]上[ j ]下[ h ]左[ l ]右
-#binde = , h, movewindow, l
-#binde = , l, movewindow, r
-#binde = , k, movewindow, u
-#binde = , j, movewindow, d
-#binde = , x, movewindow, mon:eDP-1
-#binde = , m, movewindow, mon:HDMI-A-1
-#bind = , escape, submap, reset
-#submap = reset
 # move active window to workspace
 #bind = $mainMod, ?, submap, 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 ]工作区
 #submap = 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 ]工作区
@@ -380,8 +369,8 @@ binde = $mainMod shift, z, togglespecialworkspace, en-zh
 #bind = , escape, submap, reset
 #submap = reset
 # move active window to workspace and focus
-bind = $mainMod, m, submap, 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 ]工作区并聚焦
-submap = 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 ]工作区并聚焦
+bind = $mainMod, m, submap, 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 h l j k x m ]工作区并聚焦
+submap = 移动当前窗口至[ 1 2 3 4 5 6 7 8 9 h l j k x m ]工作区并聚焦
 bind = , 1, movetoworkspace, 1
 bind = , 1, submap, reset
 bind = , 2, movetoworkspace, 2
@@ -400,6 +389,18 @@ bind = , 8, movetoworkspace, 8
 bind = , 8, submap, reset
 bind = , 9, movetoworkspace, 9
 bind = , 9, submap, reset
+binde = , h, movewindow, l
+bind = , h, submap, reset
+binde = , l, movewindow, r
+bind = , l, submap, reset
+binde = , k, movewindow, u
+bind = , k, submap, reset
+binde = , j, movewindow, d
+bind = , j, submap, reset
+binde = , x, movewindow, mon:eDP-1
+bind = , x, submap, reset
+binde = , m, movewindow, mon:DP-3
+bind = , m, submap, reset
 bind = , escape, submap, reset
 submap = reset
 # position new window
