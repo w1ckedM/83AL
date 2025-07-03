@@ -12,6 +12,7 @@ btop
 btrfs-progs
 cliphist
 cmake
+cmatrix
 dosfstools
 efibootmgr
 emacs-wayland
