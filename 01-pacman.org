@@ -17,16 +17,8 @@
   DownloadUser = alpm
   LocalFileSigLevel = Optional
 
-  [core-x86-64-v3]
-  SigLevel = Never
-  Include = /etc/pacman.d/alhp-mirrorlist
-
   [core]
   Include = /etc/pacman.d/mirrorlist
-
-  [extra-x86-64-v3]
-  SigLevel = Never
-  Include = /etc/pacman.d/alhp-mirrorlist
 
   [extra]
   Include = /etc/pacman.d/mirrorlist
