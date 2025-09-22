@@ -37,6 +37,8 @@ intel-ucode
 iwd
 keyd
 kitty
+libreoffice-still
+libreoffice-still-zh-cn
 libva-utils
 libvterm
 linux
@@ -67,6 +69,7 @@ unzip
 v2raya
 vulkan-intel
 waybar
+wechat-bin
 wget
 xdg-desktop-portal-hyprland
 yay
