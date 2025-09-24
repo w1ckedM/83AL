@@ -440,8 +440,14 @@
      ("C-c c o" . smerge-keep-other)
      ("C-c c p" . smerge-previous)
      ;;; mode
+     ("C-c z c" . css-mode)
      ("C-c z g" . gptel-mode)
+     ("C-c z h" . html-mode)
+     ("C-c z l" . lisp-mode)
      ("C-c z o" . org-mode)
+     ("C-c z p" . python-mode)
+     ("C-c z s" . todo-mode)
+     ("C-c z t" . text-mode)
      ("C-c z v" . vterm)
      ("C-c z R" . restart-emacs))
     :bind-keymap
