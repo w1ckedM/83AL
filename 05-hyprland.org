@@ -113,9 +113,9 @@ exec-once = [workspace 2 silent] braveb
 #exec-once = [workspace 9 silent] kitty yazi
 #+end_src
 *** output device - [[file:~/.config/hypr/conf/02-output.conf][02-output.conf]]
-**** laptop - [[file:~/.config/hypr/conf/22-output-laptop.conf][22-output-laptop.conf]]
+**** TODO laptop - [[file:~/.config/hypr/conf/22-output-laptop.conf][22-output-laptop.conf]]
 #+begin_src conf :tangle ~/.config/hypr/conf/22-output-laptop.conf
-monitor = eDP-1, preferred, 0x0, 1
+monitor = eDP-1, preferred, 0x0, 1.5
 monitor = DP-3, disable
 #+end_src
 **** single monitor - [[file:~/.config/hypr/conf/22-output-single.conf][22-output-single.conf]]
@@ -627,12 +627,10 @@ text-color=#c6d0f5
     "reload_style_on_change": true,
     "include": [
       "~/.config/waybar/modules/hyprwss.json",
-      "~/.config/waybar/modules/mpris.json",
       "~/.config/waybar/modules/hyprsub.json",
       "~/.config/waybar/modules/tray.json"
     ],
     "modules-left": [
-      "mpris"
     ],
     "modules-center": [
       "hyprland/workspaces"
